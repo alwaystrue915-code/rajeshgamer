@@ -18,7 +18,7 @@ button { cursor: pointer; }
   box-shadow: 0 0 45px rgba(14, 86, 170, .14);
 }
 .event-card::before { display: none; }
-.hero { position: relative; margin: -20px -24px -2px; }
+.hero { position: relative; margin: 3px -24px -2px; }
 .hero img { display: block; width: 100%; height: auto; }
 
 .uid-form { position: relative; display: flex; align-items: center; gap: 10px; margin-top: 16px; padding: 6px 16px; border: 2px solid #a6c6e4; border-radius: 17px; background: white; box-shadow: 0 4px 0 #d5e3ef, 0 7px 12px #c5d9eb; }
@@ -95,7 +95,7 @@ button { cursor: pointer; }
   .page-shell { padding: 0; }
   .event-card { min-height: 100vh; padding: 25px 16px; border-radius: 0; }
   .event-card::before { display: none; }
-  .hero { margin: -18px -14px 0; }
+  .hero { margin: 3px -14px 0; }
   .rewards { gap: 10px; }
   .reward-card { padding: 0 0 8px; border-radius: 16px; }
   .claim-small { margin-top: 8px; padding: 6px; font-size: 14px; }
@@ -189,7 +189,7 @@ body { background: #050505; }
   width: min(658px,100%); min-height: 100vh; padding: 22px clamp(18px,4vw,29px) 24px; color: #071842;
   background: linear-gradient(180deg,rgba(255,255,255,.98),rgba(242,250,255,.97)); box-shadow: 0 0 45px rgba(14,86,170,.14);
 }
-.theme-blue .hero { margin: -20px -24px 0; }
+.theme-blue .hero { margin: 3px -24px 0; }
 .theme-blue .hero img { display: block; width: 100%; height: auto; }
 .theme-blue .uid-form { gap: 10px; margin: 16px 0 0; padding: 6px 16px; border: 2px solid #a6c6e4; border-radius: 17px; clip-path: none; background: #fff; box-shadow: 0 4px 0 #d5e3ef,0 7px 12px #c5d9eb; }
 .theme-blue .user-icon { color: #0877f3; filter: drop-shadow(0 2px 2px #94bce6); }
@@ -226,7 +226,7 @@ body { background: #050505; }
 .page-blue .success-modal button { color: #fff; background: linear-gradient(#239cff,#005bdd); }
 @media (max-width:620px) {
   .theme-blue { padding: 25px 16px; }
-  .theme-blue .hero { margin: -18px -14px 0; }
+  .theme-blue .hero { margin: 3px -14px 0; }
   .theme-blue .uid-form { margin-top: 16px; padding: 5px 13px; }
   .theme-blue .uid-form input { padding: 7px 4px; font-size: 14px; }
   .theme-blue .rewards { gap: 10px; }
