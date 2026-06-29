@@ -51,9 +51,7 @@ async function fetchRewards() {
     rewards.value = (cached.rewards || []).filter((r) => r?.id && r?.image_url).slice(0, 6)
     selectedRewards.value = selectedRewards.value.filter((id) => rewards.value.some((r) => r.id === id))
     loading.value = false
-    return
   }
-  loading.value = true
   loadError.value = false
   const controller = new AbortController()
   const timeout = setTimeout(() => controller.abort(), 8000)
@@ -80,7 +78,7 @@ async function fetchRewards() {
       } catch {}
     })
   } catch {
-    loadError.value = true
+    if (!cached) loadError.value = true
   } finally {
     clearTimeout(timeout)
     loading.value = false
@@ -121,11 +119,9 @@ function validateUid() {
 function claimRewards() {
   if (settings.value.claim_mode === 'redirect') {
     const url = settings.value.redirect_url?.trim()
-    if (url) window.location.assign(url)
-    else {
-      status.value = 'Redirect URL is not configured.'
-      statusType.value = 'error'
-    }
+    if (url) { window.location.href = url; return }
+    status.value = 'Redirect URL is not configured.'
+    statusType.value = 'error'
     return
   }
   const count = selectedRewards.value.length
@@ -136,8 +132,6 @@ function claimRewards() {
     return
   }
   if (!validateUid()) return
-  status.value = ''
-  statusType.value = ''
   showSuccess.value = true
 }
 
