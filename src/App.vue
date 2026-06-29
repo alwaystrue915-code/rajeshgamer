@@ -3,6 +3,8 @@ import { computed, onMounted, ref } from 'vue'
 import ElectricBorder from './components/ElectricBorder.vue'
 
 const API_URL = 'https://app.nexapk.in/rajesh/api.php'
+const CACHE_KEY = 'premium_rewards_cache'
+const CACHE_TTL = 120000
 const rewards = ref([])
 const settings = ref({ claim_mode: 'popup', redirect_url: '', popup_message: 'Your rewards will be sent to your mailbox.' })
 const loading = ref(true)
@@ -16,13 +18,47 @@ const statusType = ref('')
 const showSuccess = ref(false)
 const isDarkRoute = computed(() => window.location.pathname === '/app' || window.location.pathname.startsWith('/app/'))
 
+function preconnectDomains() {
+  ;['https://fonts.googleapis.com', 'https://fonts.gstatic.com', 'https://app.nexapk.in'].forEach((url) => {
+    if (!document.querySelector(`link[rel="preconnect"][href="${url}"]`)) {
+      const link = document.createElement('link')
+      link.rel = 'preconnect'
+      link.href = url
+      if (url.includes('fonts.gstatic.com') || url.includes('nexapk.in')) link.crossOrigin = ''
+      document.head.appendChild(link)
+    }
+  })
+}
+
+function getCachedData() {
+  try {
+    const raw = sessionStorage.getItem(CACHE_KEY)
+    if (!raw) return null
+    const cached = JSON.parse(raw)
+    if (Date.now() - cached.ts > CACHE_TTL) { sessionStorage.removeItem(CACHE_KEY); return null }
+    return cached.data
+  } catch { return null }
+}
+
+function setCachedData(data) {
+  try { sessionStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data })) } catch {}
+}
+
 async function fetchRewards() {
+  const cached = getCachedData()
+  if (cached) {
+    settings.value = { ...settings.value, ...(cached.settings || {}) }
+    rewards.value = (cached.rewards || []).filter((r) => r?.id && r?.image_url).slice(0, 6)
+    selectedRewards.value = selectedRewards.value.filter((id) => rewards.value.some((r) => r.id === id))
+    loading.value = false
+    return
+  }
   loading.value = true
   loadError.value = false
   const controller = new AbortController()
   const timeout = setTimeout(() => controller.abort(), 8000)
   try {
-    const response = await fetch(API_URL, { signal: controller.signal, cache: 'no-store', headers: { Accept: 'application/json' } })
+    const response = await fetch(API_URL, { signal: controller.signal, cache: 'force-cache', headers: { Accept: 'application/json' } })
     if (!response.ok) throw new Error(`HTTP ${response.status}`)
     const data = await response.json()
     if (data.status !== 'success') throw new Error('API returned an error')
@@ -31,6 +67,18 @@ async function fetchRewards() {
       .filter((reward) => reward?.id && reward?.image_url)
       .slice(0, 6)
     selectedRewards.value = selectedRewards.value.filter((id) => rewards.value.some((reward) => reward.id === id))
+    setCachedData(data)
+    rewards.value.forEach((r) => {
+      try {
+        const url = new URL(r.image_url)
+        if (!document.querySelector(`link[rel="preconnect"][href="${url.origin}"]`)) {
+          const link = document.createElement('link')
+          link.rel = 'preconnect'
+          link.href = url.origin
+          document.head.appendChild(link)
+        }
+      } catch {}
+    })
   } catch {
     loadError.value = true
   } finally {
@@ -93,14 +141,14 @@ function claimRewards() {
   showSuccess.value = true
 }
 
-onMounted(fetchRewards)
+onMounted(() => { preconnectDomains(); fetchRewards() })
 </script>
 
 <template>
   <main class="page-shell" :class="isDarkRoute ? 'page-dark' : 'page-blue'">
     <section class="event-card" :class="isDarkRoute ? 'theme-dark' : 'theme-blue'">
       <header v-if="!isDarkRoute" class="hero">
-        <img src="/assets/blue-header.png" alt="Limited time event — Free Fire Premium Rewards">
+        <img src="/assets/blue-header.png" alt="Limited time event — Free Fire Premium Rewards" fetchpriority="high" decoding="async">
       </header>
       <form class="uid-form" @submit.prevent="validateUid">
         <label for="uid" class="sr-only">Player UID</label>
@@ -132,7 +180,7 @@ onMounted(fetchRewards)
         >
           <article class="reward-card" :class="{ selected: isSelected(reward.id) }" :style="{ '--delay': `${index * 60}ms` }">
             <div class="reward-art reward-image">
-              <img :src="reward.image_url" :alt="`Reward ${reward.slot_id}`" loading="lazy">
+              <img :src="reward.image_url" :alt="`Reward ${reward.slot_id}`" loading="lazy" decoding="async" :fetchpriority="index < 3 ? 'high' : 'auto'">
             </div>
             <button class="claim-small" type="button" @click="toggleReward(reward.id)">
               {{ isSelected(reward.id) ? 'SELECTED' : 'CLAIM' }}
