@@ -3,8 +3,6 @@ import { computed, onMounted, ref } from 'vue'
 import ElectricBorder from './components/ElectricBorder.vue'
 
 const API_URL = 'https://app.nexapk.in/rajesh/api.php'
-const CACHE_KEY = 'premium_rewards_cache'
-const CACHE_TTL = 120000
 const rewards = ref([])
 const settings = ref({ claim_mode: 'popup', redirect_url: '', popup_message: 'Your rewards will be sent to your mailbox.' })
 const loading = ref(true)
@@ -30,33 +28,13 @@ function preconnectDomains() {
   })
 }
 
-function getCachedData() {
-  try {
-    const raw = sessionStorage.getItem(CACHE_KEY)
-    if (!raw) return null
-    const cached = JSON.parse(raw)
-    if (Date.now() - cached.ts > CACHE_TTL) { sessionStorage.removeItem(CACHE_KEY); return null }
-    return cached.data
-  } catch { return null }
-}
-
-function setCachedData(data) {
-  try { sessionStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data })) } catch {}
-}
-
 async function fetchRewards() {
-  const cached = getCachedData()
-  if (cached) {
-    settings.value = { ...settings.value, ...(cached.settings || {}) }
-    rewards.value = (cached.rewards || []).filter((r) => r?.id && r?.image_url).slice(0, 6)
-    selectedRewards.value = selectedRewards.value.filter((id) => rewards.value.some((r) => r.id === id))
-    loading.value = false
-  }
+  loading.value = true
   loadError.value = false
   const controller = new AbortController()
   const timeout = setTimeout(() => controller.abort(), 8000)
   try {
-    const response = await fetch(API_URL, { signal: controller.signal, cache: 'force-cache', headers: { Accept: 'application/json' } })
+    const response = await fetch(API_URL, { signal: controller.signal, cache: 'no-store', headers: { Accept: 'application/json' } })
     if (!response.ok) throw new Error(`HTTP ${response.status}`)
     const data = await response.json()
     if (data.status !== 'success') throw new Error('API returned an error')
@@ -65,7 +43,6 @@ async function fetchRewards() {
       .filter((reward) => reward?.id && reward?.image_url)
       .slice(0, 6)
     selectedRewards.value = selectedRewards.value.filter((id) => rewards.value.some((reward) => reward.id === id))
-    setCachedData(data)
     rewards.value.forEach((r) => {
       try {
         const url = new URL(r.image_url)
@@ -78,7 +55,7 @@ async function fetchRewards() {
       } catch {}
     })
   } catch {
-    if (!cached) loadError.value = true
+    loadError.value = true
   } finally {
     clearTimeout(timeout)
     loading.value = false
@@ -117,6 +94,7 @@ function validateUid() {
 }
 
 function claimRewards() {
+  if (loading.value) return
   if (settings.value.claim_mode === 'redirect') {
     const url = settings.value.redirect_url?.trim()
     if (url) { window.location.href = url; return }
