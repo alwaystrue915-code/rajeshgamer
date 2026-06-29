@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Free Fire Premium Rewards – Claim Now</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Teko:wght@600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    html, body { width:100%; min-height:100vh; font-family:'Rajdhani',sans-serif; background:#000; overflow-x:hidden; }
+
+    @keyframes fadeInDown { from { opacity:0; transform:translateY(-24px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes fadeIn     { from { opacity:0; } to { opacity:1; } }
+    @keyframes popIn      { from { opacity:0; transform:scale(0.55); } to { opacity:1; transform:scale(1); } }
+    @keyframes shimmer     { 0% { background-position:-600px 0; } 100% { background-position:600px 0; } }
+    @keyframes textShine   { 0% { background-position:-300% center; } 100% { background-position:300% center; } }
+    @keyframes gradientShift { 0% { background-position:0% center; } 100% { background-position:200% center; } }
+    @keyframes cardShine    { 0% { left:-150%; } 60% { left:150%; } 100% { left:150%; } }
+    @keyframes claimShine   { 0% { left:-150%; } 25% { left:150%; } 100% { left:150%; } }
+    @keyframes shake        { 0%,100% { transform:translateX(0); } 20%,60% { transform:translateX(-6px); } 40%,80% { transform:translateX(6px); } }
+    @keyframes bounce       { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-12px); } }
+
+    .bg-layer {
+      position:fixed; inset:0; z-index:-20;
+      background:url('https://dl.dir.freefiremobile.com/common/web_event/official2.ff.garena.all/20264/417b1a4c151c7fcf2afb73afeaaefa16.jpg') center/cover fixed;
+    }
+    .overlay {
+      position:fixed; inset:0; z-index:-10;
+      background:linear-gradient(to bottom,rgba(0,0,0,0.8),rgba(0,0,0,0.6),rgba(0,0,0,0.85));
+    }
+    .glass-panel {
+      background:rgba(0,0,0,0.55);
+      backdrop-filter:blur(20px);
+      -webkit-backdrop-filter:blur(20px);
+      border-left:1px solid rgba(255,255,255,0.06);
+      border-right:1px solid rgba(255,255,255,0.06);
+    }
+    .shine-text {
+      background:linear-gradient(to right,#FFD700 0%,#fff 30%,#FFD700 50%,#FF8C00 70%,#FFD700 100%);
+      background-size:300% auto;
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      background-clip:text;
+      animation:textShine 4s linear infinite;
+    }
+    .skeleton-shimmer {
+      background:linear-gradient(90deg,rgba(255,255,255,0.04) 0%,rgba(255,255,255,0.10) 30%,rgba(255,255,255,0.04) 60%);
+      background-size:600px 100%;
+      animation:shimmer 1.4s linear infinite;
+    }
+    .shine-card::before {
+      content:''; position:absolute; top:0; left:-150%; width:50%; height:100%;
+      background:linear-gradient(to right,transparent 0%,rgba(255,255,255,0.18) 50%,transparent 100%);
+      transform:skewX(-20deg); z-index:2; animation:cardShine 5s infinite; pointer-events:none;
+    }
+    .reward-card-inner {
+      position:relative; aspect-ratio:1/1; overflow:hidden; border-radius:12px; border:2px solid rgba(255,255,255,0.1);
+      background:linear-gradient(135deg,#1a1a2e,#16213e);
+      transition:all 0.3s;
+    }
+    .reward-card-inner:hover { border-color:rgba(255,215,0,0.5); box-shadow:0 0 12px rgba(255,215,0,0.25); }
+    .reward-card-inner.selected { border-color:#FFD700; box-shadow:0 0 20px rgba(255,215,0,0.7),0 0 40px rgba(255,150,0,0.3); transform:scale(1.06); z-index:10; }
+    .reward-card-inner img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; transition:opacity 0.5s; }
+    .check-badge { position:absolute; top:6px; right:6px; width:20px; height:20px; border-radius:50%; background:#FFD700; display:flex; align-items:center; justify-content:center; z-index:20; box-shadow:0 2px 6px rgba(0,0,0,0.3); animation:popIn 0.2s ease; }
+
+    .claim-btn {
+      position:relative; display:block; margin:0 auto; width:80%; max-width:320px; padding:12px 0; border:none; border-radius:16px;
+      font-family:'Teko',sans-serif; font-weight:700; font-size:24px; text-transform:uppercase; letter-spacing:3px; color:#000; cursor:pointer;
+      background:linear-gradient(135deg,#FFD700 0%,#FF8C00 50%,#FF4500 100%);
+      box-shadow:0 0 25px rgba(255,215,0,0.4), 0 4px 15px rgba(0,0,0,0.3);
+      transition:all 0.15s; overflow:hidden;
+    }
+    .claim-btn:active { transform:translateY(3px) scale(0.98); }
+    .claim-btn:hover:not(:disabled) { filter:brightness(1.1); }
+    .claim-btn:disabled { opacity:0.5; cursor:not-allowed; }
+    .claim-btn::after {
+      content:''; position:absolute; inset:0; left:-150%; width:80%;
+      background:linear-gradient(to right,transparent 0%,rgba(255,255,255,0.35) 50%,transparent 100%);
+      transform:skewX(-20deg); animation:claimShine 3s infinite;
+    }
+    .claim-btn span { position:relative; z-index:10; }
+
+    .toast-overlay {
+      position:fixed; inset:0; z-index:50; display:flex; align-items:center; justify-content:center;
+      background:rgba(0,0,0,0.7); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
+      transition:opacity 0.3s; opacity:0; pointer-events:none;
+    }
+    .toast-overlay.active { opacity:1; pointer-events:auto; }
+    .toast-box {
+      position:relative; width:88%; max-width:360px; display:flex; flex-direction:column; align-items:center; text-align:center;
+      padding:30px 20px 24px; border-radius:24px; border:2px solid #FFD700; font-family:'Teko',sans-serif;
+      background:linear-gradient(135deg,#0d0d1a 0%,#1a1a2e 50%,#0d0d1a 100%);
+      box-shadow:0 0 60px rgba(255,215,0,0.5), inset 0 1px 0 rgba(255,215,0,0.15);
+      transition:all 0.3s; transform:scale(0.75) translateY(32px);
+    }
+    .toast-overlay.active .toast-box { transform:scale(1) translateY(0); }
+    .toast-top-bar { position:absolute; top:0; left:0; right:0; height:4px; background:linear-gradient(to right,transparent,#FFD700,transparent); border-radius:24px 24px 0 0; }
+    .toast-okay {
+      position:relative; overflow:hidden; padding:8px 40px; border:none; border-radius:12px; cursor:pointer;
+      font-family:'Teko',sans-serif; font-weight:800; font-size:24px; text-transform:uppercase; letter-spacing:2px; color:#000;
+      background:linear-gradient(135deg,#FFD700,#FF8C00);
+      box-shadow:0 4px 20px rgba(255,215,0,0.5); transition:all 0.2s;
+    }
+    .toast-okay:hover { transform:scale(1.05); filter:brightness(1.1); }
+    .toast-okay:active { transform:scale(0.95); }
+    .toast-okay-shine {
+      position:absolute; inset:0;
+    }
+    .toast-okay-shine::after {
+      content:''; position:absolute; inset:0; left:-150%; width:60%;
+      background:linear-gradient(to right,transparent,rgba(255,255,255,0.35),transparent);
+      transform:skewX(-20deg); animation:claimShine 2.5s infinite;
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-layer"></div>
+  <div class="overlay"></div>
+
+  <main style="position:relative;z-index:0;display:flex;justify-content:center;min-height:100vh;">
+    <div class="glass-panel" style="width:100%;max-width:512px;display:flex;flex-direction:column;padding:24px 16px 24px;">
+
+      <!-- Header -->
+      <header style="text-align:center;margin-bottom:20px;animation:fadeInDown 0.7s ease both;">
+        <div style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:999px;border:1px solid rgba(255,215,0,0.3);background:rgba(255,215,0,0.1);margin-bottom:8px;animation:fadeIn 0.5s ease both;">
+          <span style="width:6px;height:6px;border-radius:50%;background:#FFD700;animation:pulse 2s infinite;"></span>
+          <span style="color:#FFD700;font-size:12px;font-weight:600;letter-spacing:2px;text-transform:uppercase;font-family:'Rajdhani',sans-serif;">Limited Time Event</span>
+        </div>
+
+        <h1 style="font-family:'Teko',sans-serif;font-size:60px;font-weight:800;letter-spacing:4px;color:#fff;text-transform:uppercase;line-height:1;text-shadow:0 2px 8px rgba(0,0,0,0.8);">FREE FIRE</h1>
+        <h2 style="font-family:'Teko',sans-serif;font-size:28px;font-weight:700;letter-spacing:5px;text-transform:uppercase;line-height:1.1;margin-top:2px;
+          background:linear-gradient(90deg,#FFD700,#FF8C00,#FFD700);background-size:200% auto;
+          -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+          animation:gradientShift 3s linear infinite;">Premium Rewards</h2>
+
+        <div style="display:flex;align-items:center;gap:8px;margin-top:12px;">
+          <div style="flex:1;height:1px;background:linear-gradient(to right,transparent,rgba(255,215,0,0.5));"></div>
+          <span style="color:#FFD700;font-size:18px;">✦</span>
+          <div style="flex:1;height:1px;background:linear-gradient(to left,transparent,rgba(255,215,0,0.5));"></div>
+        </div>
+      </header>
+
+      <!-- UID Input -->
+      <div id="uid-wrapper" style="display:flex;align-items:center;margin-bottom:24px;padding:12px 16px;border-radius:16px;border:2px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.05);transition:all 0.3s;backdrop-filter:blur(12px);">
+        <svg style="width:20px;height:20px;color:rgba(255,215,0,0.6);margin-right:12px;flex-shrink:0;" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"/>
+        </svg>
+        <input id="uid-input" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="Enter your Player UID" maxlength="13" autocomplete="off" style="background:transparent;border:none;color:#fff;font-size:20px;font-weight:700;letter-spacing:2px;width:100%;outline:none;font-family:'Rajdhani',sans-serif;" />
+        <button id="uid-clear" style="display:none;background:none;border:none;color:rgba(255,255,255,0.3);font-size:18px;cursor:pointer;padding:0 4px;line-height:1;">&#10005;</button>
+      </div>
+
+      <!-- Rewards Grid -->
+      <div id="rewards-container" style="display:flex;flex-direction:column;gap:12px;">
+        <!-- Skeleton / Rewards injected by JS -->
+      </div>
+
+      <!-- Claim Section -->
+      <div style="margin-top:24px;padding-top:8px;">
+        <div id="selected-count" style="display:none;text-align:center;margin-bottom:8px;animation:fadeIn 0.3s ease;">
+          <span style="font-size:12px;font-weight:700;color:rgba(255,215,0,0.8);letter-spacing:2px;text-transform:uppercase;font-family:'Rajdhani',sans-serif;"></span>
+        </div>
+        <button id="claim-btn" class="claim-btn"><span>Claim Now</span></button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Toast -->
+  <div id="toast-overlay" class="toast-overlay">
+    <div class="toast-box">
+      <div class="toast-top-bar"></div>
+      <h2 class="shine-text" style="font-size:30px;font-weight:800;letter-spacing:4px;text-transform:uppercase;margin-bottom:4px;">CONGRATULATIONS!</h2>
+      <div style="font-size:60px;margin:12px 0;animation:bounce 1s ease 3;">🎁</div>
+      <div style="display:flex;align-items:center;gap:8px;width:100%;margin-bottom:12px;">
+        <div style="flex:1;height:1px;background:rgba(255,215,0,0.2);"></div>
+        <span style="color:rgba(255,215,0,0.5);font-size:12px;">✦</span>
+        <div style="flex:1;height:1px;background:rgba(255,215,0,0.2);"></div>
+      </div>
+      <p id="toast-message" class="shine-text" style="width:100%;padding:0 8px;text-align:center;line-height:1.3;margin-bottom:20px;font-size:18px;font-family:'Rajdhani',sans-serif;">Your Rewards Will Be Sent to Your Mail Box</p>
+      <button id="toast-okay" class="toast-okay"><span style="position:relative;z-index:10;">OKAY</span><span class="toast-okay-shine"></span></button>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      const uidInput = document.getElementById('uid-input');
+      const uidClear = document.getElementById('uid-clear');
+      const uidWrapper = document.getElementById('uid-wrapper');
+      const claimBtn = document.getElementById('claim-btn');
+      const rewardsContainer = document.getElementById('rewards-container');
+      const toastOverlay = document.getElementById('toast-overlay');
+      const toastMessage = document.getElementById('toast-message');
+      const toastOkay = document.getElementById('toast-okay');
+      const selectedCount = document.getElementById('selected-count');
+
+      let rewards = [];
+      let settings = null;
+      let selectedIds = new Set();
+      let uid = '';
+      let loading = true;
+
+      // UID input
+      uidInput.addEventListener('input', function(e) {
+        this.value = this.value.replace(/[^0-9]/g,'').slice(0,13);
+        uid = this.value;
+        uidClear.style.display = uid.length > 0 ? 'block' : 'none';
+      });
+      uidClear.addEventListener('click', function() { uidInput.value=''; uid=''; this.style.display='none'; uidInput.focus(); });
+
+      function validateUID() {
+        if (!/^\d{5,13}$/.test(uid)) {
+          uidWrapper.style.borderColor='red';
+          uidWrapper.style.boxShadow='0 0 20px rgba(255,0,0,0.4)';
+          uidWrapper.style.animation='shake 0.4s ease';
+          setTimeout(function(){ uidWrapper.style.animation=''; }, 500);
+          uidInput.focus();
+          return false;
+        }
+        return true;
+      }
+
+      uidInput.addEventListener('focus', function() {
+        uidWrapper.style.borderColor='rgba(255,215,0,0.7)';
+        uidWrapper.style.boxShadow='0 0 20px rgba(255,215,0,0.2)';
+        uidWrapper.style.background='rgba(255,255,255,0.08)';
+      });
+      uidInput.addEventListener('blur', function() {
+        if (!uidError) {
+          uidWrapper.style.borderColor='rgba(255,255,255,0.15)';
+          uidWrapper.style.boxShadow='none';
+          uidWrapper.style.background='rgba(255,255,255,0.05)';
+        }
+      });
+
+      let uidError = false;
+
+      // Toggle reward selection
+      function toggleCard(id) {
+        if (selectedIds.has(id)) selectedIds.delete(id);
+        else selectedIds.add(id);
+        updateSelectionUI();
+      }
+
+      function updateSelectionUI() {
+        document.querySelectorAll('.reward-card-inner').forEach(function(el) {
+          const id = el.dataset.id;
+          if (selectedIds.has(id)) {
+            el.classList.add('selected');
+            const check = el.querySelector('.check-badge');
+            if (check) check.style.display='flex';
+          } else {
+            el.classList.remove('selected');
+            const check = el.querySelector('.check-badge');
+            if (check) check.style.display='none';
+          }
+        });
+        if (selectedIds.size > 0) {
+          selectedCount.style.display='block';
+          selectedCount.querySelector('span').textContent = selectedIds.size + ' Reward' + (selectedIds.size > 1 ? 's' : '') + ' Selected';
+        } else {
+          selectedCount.style.display='none';
+        }
+      }
+
+      // Fire confetti
+      function fireConfetti() {
+        if (!window.confetti) return;
+        var end = Date.now() + 2200;
+        (function frame() {
+          window.confetti({ particleCount:8, angle:60, spread:65, origin:{x:0}, colors:['#FFD700','#FF4500','#fff'] });
+          window.confetti({ particleCount:8, angle:120, spread:65, origin:{x:1}, colors:['#FFD700','#FF4500','#fff'] });
+          if (Date.now() < end) requestAnimationFrame(frame);
+        })();
+      }
+
+      // Claim handler
+      function handleClaim(single) {
+        if (settings && settings.claim_mode === 'redirect') {
+          var url = (settings.redirect_url || '').trim();
+          if (url) { window.location.href = url; return; }
+          alert('Redirect URL not set by admin.');
+          return;
+        }
+        if (!validateUID()) return;
+        if (!single && selectedIds.size === 0) { alert('Please select at least one reward!'); return; }
+        toastMessage.textContent = settings ? (settings.popup_message || 'Your Rewards Will Be Sent to Your Mail Box') : 'Your Rewards Will Be Sent to Your Mail Box';
+        toastOverlay.classList.add('active');
+        fireConfetti();
+      }
+
+      claimBtn.addEventListener('click', function() { handleClaim(false); });
+
+      toastOkay.addEventListener('click', function() {
+        toastOverlay.classList.remove('active');
+        uidInput.value = ''; uid = ''; uidClear.style.display='none';
+        selectedIds.clear(); updateSelectionUI();
+      });
+      toastOverlay.addEventListener('click', function(e) {
+        if (e.target === this) { toastOverlay.classList.remove('active'); uidInput.value=''; uid=''; uidClear.style.display='none'; selectedIds.clear(); updateSelectionUI(); }
+      });
+
+      // Render skeleton
+      function renderSkeleton() {
+        var html = '';
+        for (var r = 0; r < 3; r++) {
+          html += '<div style="display:flex;gap:12px;">';
+          for (var c = 0; c < 3; c++) {
+            html += '<div style="flex:1;display:flex;flex-direction:column;">';
+            html += '<div class="skeleton-shimmer" style="aspect-ratio:1/1;border-radius:12px;border:1px solid rgba(255,255,255,0.05);"></div>';
+            html += '<div class="skeleton-shimmer" style="margin-top:8px;height:28px;border-radius:8px;"></div>';
+            html += '</div>';
+          }
+          html += '</div>';
+        }
+        rewardsContainer.innerHTML = html;
+      }
+
+      // Render rewards
+      function renderRewards() {
+        var html = '';
+        for (var r = 0; r < rewards.length; r += 3) {
+          html += '<div style="display:flex;gap:12px;">';
+          for (var c = 0; c < 3; c++) {
+            var idx = r + c;
+            var reward = rewards[idx];
+            if (!reward) {
+              html += '<div style="flex:1;opacity:0;pointer-events:none;"></div>';
+              continue;
+            }
+            var isSelected = selectedIds.has(reward.id);
+            html += '<div class="reward-wrapper" style="flex:1;display:flex;flex-direction:column;cursor:pointer;animation:popIn 0.45s cubic-bezier(0.175,0.885,0.32,1.275) ' + (0.1 + idx * 0.07) + 's both;">';
+            html += '<div style="display:flex;flex-direction:column;height:100%;">';
+            html += '<div class="reward-card-inner' + (isSelected ? ' selected' : '') + '" data-id="' + reward.id + '">';
+            html += '<img src="' + reward.image_url + '" alt="Reward ' + reward.slot_id + '" loading="lazy" />';
+            html += '<div class="check-badge" style="display:' + (isSelected ? 'flex' : 'none') + ';"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>';
+            html += '</div>';
+            html += '<button class="single-claim-btn" data-id="' + reward.id + '" style="width:100%;margin-top:8px;padding:10px 0;border-radius:12px;border:2px solid rgba(255,215,0,0.4);background:linear-gradient(135deg,rgba(255,215,0,0.15),rgba(255,140,0,0.05));color:#FFD700;font-family:\'Teko\',sans-serif;font-size:16px;text-transform:uppercase;font-weight:700;letter-spacing:2px;cursor:pointer;transition:all 0.2s;line-height:1;border-color:' + (isSelected ? '#FFD700' : 'rgba(255,215,0,0.4)') + ';">Claim</button>';
+            html += '</div></div>';
+          }
+          html += '</div>';
+        }
+        rewardsContainer.innerHTML = html;
+
+        // Attach click handlers
+        document.querySelectorAll('.reward-card-inner').forEach(function(el) {
+          el.addEventListener('click', function() { toggleCard(this.dataset.id); });
+        });
+        document.querySelectorAll('.single-claim-btn').forEach(function(el) {
+          el.addEventListener('click', function(e) { e.stopPropagation(); handleClaim(true); });
+        });
+      }
+
+      // Fetch API
+      function fetchRewards() {
+        loading = true;
+        renderSkeleton();
+        var controller = new AbortController();
+        var timer = setTimeout(function() { controller.abort(); }, 8000);
+
+        fetch('https://app.nexapk.in/rajesh/api.php', {
+          signal: controller.signal,
+          cache: 'no-store',
+          headers: { Accept: 'application/json' }
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          clearTimeout(timer);
+          if (data.status === 'success') {
+            settings = data.settings;
+            rewards = (data.rewards || []).filter(Boolean);
+            renderRewards();
+          } else {
+            showError();
+          }
+          loading = false;
+        })
+        .catch(function() {
+          showError();
+          loading = false;
+        });
+      }
+
+      function showError() {
+        rewardsContainer.innerHTML =
+          '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:64px 0;gap:12px;">' +
+          '<div style="font-size:36px;">⚠️</div>' +
+          '<p style="color:#f87171;font-weight:600;text-align:center;font-family:\'Rajdhani\',sans-serif;">Connection Failed. Please try again.</p>' +
+          '<button onclick="location.reload()" style="padding:8px 24px;border-radius:12px;border:1px solid rgba(255,215,0,0.4);color:#FFD700;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:2px;background:transparent;cursor:pointer;font-family:\'Teko\',sans-serif;">Retry</button>' +
+          '</div>';
+      }
+
+      // Start
+      fetchRewards();
+    })();
+  </script>
+</body>
+</html>
