@@ -56,7 +56,9 @@ onMounted(() => {
           <span class="stat-label">Redirect URL</span>
           <div class="stat-icon" style="background:rgba(255,149,0,.12);color:var(--admin-orange)" v-html='`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`'></div>
         </div>
-        <div class="stat-value" style="font-size:16px;word-break:break-all">{{ stats.redirectUrl }}</div>
+        <div class="stat-value" style="font-size:16px">
+          <span class="badge" :class="stats.redirectUrl && stats.redirectUrl !== '—' ? 'badge-green' : 'badge-red'">{{ stats.redirectUrl && stats.redirectUrl !== '—' ? 'Enabled' : 'Disabled' }}</span>
+        </div>
       </div>
     </div>
     <div class="admin-card">
