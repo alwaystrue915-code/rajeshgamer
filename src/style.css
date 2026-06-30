@@ -30,7 +30,9 @@ button { cursor: pointer; }
 .status { min-height: 22px; margin: 15px 0 4px; color: #586d8e; font-size: 13px; font-weight: 600; }
 .status.error { color: #d83950; }.status.success { color: #07885b; }
 
-.rewards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 17px; margin-top: 19px; }
+.rewards { display: flex; flex-wrap: nowrap; gap: 14px; margin-top: 19px; overflow-x: auto; padding-bottom: 8px; -webkit-overflow-scrolling: touch; scroll-snap-type: x mandatory; }
+.rewards .reward-electric { flex: 0 0 auto; width: 150px; scroll-snap-align: start; }
+.rewards .reward-electric .reward-card { width: 150px; }
 .reward-electric { min-width: 0; border-radius: 20px; }
 .reward-electric .reward-card { width: 100%; }
 .reward-card { position: relative; display: flex; flex-direction: column; width: 100%; aspect-ratio: .68; overflow: hidden; padding: 0 0 11px; border: 2px solid #c4d9ec; border-radius: 20px; background: white; box-shadow: 0 5px 0 #d6e4ef, 0 9px 15px rgba(48, 102, 161, .17); transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease; animation: rise .5s both; animation-delay: var(--delay); }
@@ -100,7 +102,9 @@ button { cursor: pointer; }
   .event-card { min-height: 100vh; padding: 25px 16px; border-radius: 0; }
   .event-card::before { display: none; }
   .hero { margin: 3px -14px 0; }
-  .rewards { gap: 10px; }
+  .rewards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; overflow: visible; padding-bottom: 0; }
+  .rewards .reward-electric { width: auto; scroll-snap-align: none; }
+  .rewards .reward-electric .reward-card { width: 100%; }
   .reward-card { padding: 0 0 8px; border-radius: 16px; }
   .claim-small { margin-top: 8px; padding: 6px; font-size: 14px; }
   .uid-form { padding: 5px 13px; }
@@ -134,7 +138,7 @@ body { background: #050505; }
 .theme-dark .uid-form input:-webkit-autofill:focus { -webkit-text-fill-color: #eee; -webkit-box-shadow: 0 0 0 1000px #0b0d0d inset; caret-color: #eee; }
 .status { margin: -12px 0 12px; color: #d3aa34; }
 .status.error { color: #ff594d; }.status.success { color: #ffc21a; }
-.rewards { gap: 14px; margin-top: 0; }
+.rewards { gap: 12px; margin-top: 0; }
 .reward-electric { border-radius: 4px; }
 .reward-card {
   aspect-ratio: .72; padding-bottom: 8px; border: 1px solid #76622c; border-radius: 3px;
@@ -182,7 +186,9 @@ body { background: #050505; }
   .event-card { padding: clamp(220px,57vw,350px) 22px 24px; }
   .uid-form { margin: 0 7px 22px; padding: 8px 17px; }
   .uid-form input { padding: 8px 4px; font-size: 15px; }
-  .rewards { gap: 10px; }
+  .rewards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; overflow: visible; padding-bottom: 0; }
+  .rewards .reward-electric { width: auto; scroll-snap-align: none; }
+  .rewards .reward-electric .reward-card { width: 100%; }
   .claim-small { width: calc(100% - 10px); margin-top: 6px; padding: 6px 3px; font-size: 15px; }
   .claim-main { width: 78%; padding: 9px 15px; }
 }
@@ -206,7 +212,7 @@ body { background: #050505; }
 .theme-blue .uid-form input::placeholder { color: #8490a2; opacity: 1; }
 .theme-blue .status { margin: 15px 0 4px; color: #586d8e; }
 .theme-blue .status.error { color: #d83950; }.theme-blue .status.success { color: #07885b; }
-.theme-blue .rewards { gap: 17px; margin-top: 19px; }
+.theme-blue .rewards { gap: 14px; margin-top: 19px; }
 .theme-blue .reward-electric { border-radius: 20px; }
 .theme-blue .reward-card { aspect-ratio: .68; padding-bottom: 11px; border: 2px solid #c4d9ec; border-radius: 20px; background: #fff; box-shadow: 0 5px 0 #d6e4ef,0 9px 15px rgba(48,102,161,.17); }
 .theme-blue .reward-card:hover { border-color: #2c8eff; }
@@ -238,13 +244,17 @@ body { background: #050505; }
   .theme-blue .hero { margin: 3px -14px 0; }
   .theme-blue .uid-form { margin-top: 16px; padding: 5px 13px; }
   .theme-blue .uid-form input { padding: 7px 4px; font-size: 14px; }
-  .theme-blue .rewards { gap: 10px; }
+  .theme-blue .rewards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; overflow: visible; padding-bottom: 0; }
+  .theme-blue .rewards .reward-electric { width: auto; scroll-snap-align: none; }
+  .theme-blue .rewards .reward-electric .reward-card { width: 100%; }
   .theme-blue .claim-small { width: 86%; margin-top: 8px; padding: 6px; font-size: 14px; }
   .theme-blue .claim-main { width: 76%; padding: 8px 14px; }
 }
 @media (max-width:380px) {
   .theme-blue,.theme-dark { padding-left: 12px; padding-right: 12px; }
   .rewards { gap: 7px; }
+  .rewards .reward-electric { width: auto; }
+  .rewards .reward-electric .reward-card { width: 100%; }
   .claim-small { font-size: 12px; letter-spacing: 0; }
 }
 
@@ -266,11 +276,15 @@ body { background: #050505; }
 }
 @media (min-width:621px) and (max-width:900px) {
   .event-card { width: min(658px,100%); }
-  .rewards { grid-template-columns: repeat(3,minmax(0,1fr)); }
+  .rewards { gap: 12px; }
+  .rewards .reward-electric { width: 130px; }
+  .rewards .reward-electric .reward-card { width: 130px; }
 }
 @media (max-width:340px) {
   .theme-blue,.theme-dark { padding-left: 8px; padding-right: 8px; }
   .rewards { gap: 5px; }
+  .rewards .reward-electric { width: auto; }
+  .rewards .reward-electric .reward-card { width: 100%; }
   .claim-small { padding-left: 1px; padding-right: 1px; font-size: 11px; }
   .uid-form { margin-left: 2px; margin-right: 2px; }
 }
