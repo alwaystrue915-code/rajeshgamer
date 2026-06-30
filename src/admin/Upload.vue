@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-const UPLOAD_API = 'https://app.nexapk.in/rajesh/upload.php'
+const UPLOAD_API = 'https://app.nexapk.in/api.php'
 const API_KEY = 'yonogames-v2'
 const file = ref(null)
 const urlInput = ref('')
