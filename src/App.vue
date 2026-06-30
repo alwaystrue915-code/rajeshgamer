@@ -51,7 +51,7 @@ async function fetchRewards({ silent = false } = {}) {
     const data = await response.json()
     if (data.status !== 'success') throw new Error('API returned an error')
     settings.value = { ...settings.value, ...(data.settings || {}) }
-    rewards.value = (data.rewards || []).filter((reward) => reward?.id)
+    rewards.value = (data.rewards || []).filter((reward) => reward?.id).slice(0, 6)
     selectedRewards.value = selectedRewards.value.filter((id) => rewards.value.some((reward) => reward.id === id))
     rewards.value.forEach((r) => {
       try {

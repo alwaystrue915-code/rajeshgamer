@@ -82,7 +82,7 @@ function mapReward(r) {
 }
 
 async function getRewardRows() {
-  return prisma.reward.findMany({ orderBy: [{ slotId: 'asc' }, { id: 'asc' }] })
+  return prisma.reward.findMany({ orderBy: [{ slotId: 'asc' }, { id: 'asc' }], take: 6 })
 }
 
 async function getCachedRewards(options) {
@@ -103,7 +103,10 @@ app.get('/api/rewards', async (req, res) => {
   try {
     let rewards = await getCachedRewards()
     if (!rewards.length) rewards = await ensureFallbackSlots()
-    res.json({ status: 'success', rewards })
+    const rows = await prisma.setting.findMany()
+    const settings = {}
+    rows.forEach(r => settings[r.key] = r.value)
+    res.json({ status: 'success', rewards, settings })
   } catch { res.status(500).json({ status: 'error', message: 'Failed.' }) }
 })
 
