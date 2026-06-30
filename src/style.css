@@ -73,9 +73,9 @@ button { cursor: pointer; }
 .success-modal > p strong { color: #075ee8; }
 .success-modal button { position: relative; min-width: 160px; padding: 10px 25px; border: 0; border-radius: 999px; color: white; font-family: 'Barlow Condensed'; font-size: 18px; font-weight: 800; letter-spacing: .7px; background: linear-gradient(#239cff,#005bdd); box-shadow: 0 4px 10px rgba(0,91,221,.35); }
 .success-particles { position: absolute; inset: 0; pointer-events: none; }
-.success-particles i { --angle: calc(var(--i) * 15deg); --fc: hsl(calc(var(--i) * 15 + 0),80%,55%); position: absolute; top: 50%; left: 50%; width: 14px; height: 18px; border-radius: 3px; background: linear-gradient(90deg,transparent 38%,rgba(255,255,255,.55) 38% 62%,transparent 62%),var(--fc); animation: firecracker-burst 1.6s calc(var(--i) * -30ms) ease-out infinite; }
-.success-particles i::before { content: ''; position: absolute; top: -4px; left: -2px; right: -2px; height: 5px; border-radius: 3px 3px 1px 1px; background: rgba(255,255,255,.25); }
-.success-particles i::after { content: ''; position: absolute; top: -3px; left: 50%; transform: translateX(-50%); width: 3px; height: calc(100% + 4px); border-radius: 1px; background: rgba(255,255,255,.55); }
+.success-particles i { --angle: calc(var(--i) * 15deg); --fc: hsl(calc(var(--i) * 15 + 0),80%,55%); position: absolute; top: 50%; left: 50%; width: 20px; height: 26px; border-radius: 4px; background: linear-gradient(90deg,transparent 38%,rgba(255,255,255,.55) 38% 62%,transparent 62%),var(--fc); animation: firecracker-burst 1.6s calc(var(--i) * -30ms) ease-out infinite; }
+.success-particles i::before { content: ''; position: absolute; top: -5px; left: -3px; right: -3px; height: 7px; border-radius: 4px 4px 1px 1px; background: rgba(255,255,255,.25); }
+.success-particles i::after { content: ''; position: absolute; top: -4px; left: 50%; transform: translateX(-50%); width: 4px; height: calc(100% + 6px); border-radius: 1px; background: rgba(255,255,255,.55); }
 .success-stars { position: absolute; inset: 0; pointer-events: none; }
 .success-stars b { --sa: calc(var(--s) * 45deg); position: absolute; top: 50%; left: 50%; width: 10px; height: 10px; clip-path: polygon(50% 0,61% 35%,100% 50%,61% 65%,50% 100%,39% 65%,0 50%,39% 35%); background: #ffd700; animation: star-burst 1.2s calc(var(--s) * -60ms) ease-out infinite; }
 .success-pop-enter-active, .success-pop-leave-active { transition: opacity .28s ease; }
@@ -287,7 +287,7 @@ body { background: #050505; }
 .page-dark .success-modal button { border-radius: 0; clip-path: polygon(8px 0,calc(100% - 8px) 0,100% 8px,100% calc(100% - 8px),calc(100% - 8px) 100%,8px 100%,0 calc(100% - 8px),0 8px); animation: app-text-fade .5s .5s both; }
 .page-dark .success-modal .popup-message { animation: app-text-fade .5s .4s both; }
 .page-dark .success-modal > p:not(.success-kicker) { animation: app-text-fade .5s .45s both; }
-.page-dark .success-particles i { width: 12px; height: 16px; border-radius: 2px; background: linear-gradient(90deg,transparent 36%,rgba(255,255,255,.65) 36% 64%,transparent 64%),#ff9d00; box-shadow: 0 0 6px #ff8a00; animation-name: app-spark-burst; animation-duration: 1.4s; }
+.page-dark .success-particles i { width: 18px; height: 24px; border-radius: 3px; background: linear-gradient(90deg,transparent 36%,rgba(255,255,255,.65) 36% 64%,transparent 64%),#ff9d00; box-shadow: 0 0 8px #ff8a00; animation-name: app-spark-burst; animation-duration: 1.4s; }
 .page-dark .success-particles i::before { background: rgba(255,255,255,.3); }
 .page-dark .success-particles i::after { background: rgba(255,255,255,.65); }
 .page-dark .success-stars b { background: #ffd700; box-shadow: 0 0 6px #ffd700; animation-name: app-star-burst; }
