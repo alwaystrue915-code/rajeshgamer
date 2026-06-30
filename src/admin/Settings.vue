@@ -26,7 +26,7 @@ async function save() {
 }
 </script>
 <template>
-  <div style="display:flex;align-items:center;justify-content:space-between">
+  <div class="admin-page-toolbar">
     <div><h1>Settings</h1><p class="subtitle">Configure claim behavior and redirect URL</p></div>
     <button class="admin-btn admin-btn-success" @click="save" :disabled="saving">{{ saving ? 'Saving...' : 'Save Changes' }}</button>
   </div>

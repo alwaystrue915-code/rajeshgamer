@@ -40,7 +40,7 @@ function copyUrl() { if (result.value?.url) { navigator.clipboard.writeText(resu
 <template>
   <h1>Upload</h1>
   <p class="subtitle">Upload images or import from URL</p>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+  <div class="upload-grid">
     <div class="admin-card">
       <h2>File Upload</h2>
       <div class="field-group">

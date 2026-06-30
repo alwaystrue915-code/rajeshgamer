@@ -56,7 +56,7 @@ function deleteImg(slot) {
 }
 </script>
 <template>
-  <div style="display:flex;align-items:center;justify-content:space-between">
+  <div class="admin-page-toolbar">
     <div><h1>Rewards</h1><p class="subtitle">Manage slot images — tap to upload, delete to remove</p></div>
   </div>
   <div v-if="loading" style="color:var(--admin-text-secondary);padding:40px 0">Loading...</div>
@@ -75,8 +75,9 @@ function deleteImg(slot) {
 </template>
 
 <style scoped>
-.slot-grid { display: flex; flex-wrap: wrap; gap: 16px; }
-.slot-card { flex: 0 0 auto; width: 160px; border-radius: 14px; background: var(--admin-card); border: 1px solid var(--admin-border); overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
+.slot-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(170px,1fr)); gap: 18px; }
+.slot-card { width: auto; min-width: 0; border-radius: 18px; background: var(--admin-card); border: 1px solid var(--admin-border); overflow: hidden; box-shadow: var(--admin-shadow); transition: transform .2s ease,box-shadow .2s ease; }
+.slot-card:hover { transform: translateY(-3px); box-shadow: var(--admin-shadow-lg); }
 .slot-label { padding: 10px 12px 6px; font-size: 13px; font-weight: 700; color: var(--admin-text); }
 .slot-img-wrap { position: relative; width: 100%; aspect-ratio: 1; cursor: pointer; overflow: hidden; background: #f0f0f0; }
 .slot-img-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -87,6 +88,6 @@ function deleteImg(slot) {
 .slot-delete:hover { background: rgba(255,59,48,.06); }
 @media (max-width:768px) {
   .slot-grid { gap: 10px; }
-  .slot-card { width: calc(50% - 5px); }
+  .slot-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
 }
 </style>

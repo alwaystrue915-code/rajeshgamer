@@ -8,9 +8,10 @@ function isActive(path) { return route.path === path }
 function logout() { sessionStorage.removeItem('admin_token'); router.push('/admin/login') }
 function closeMobile() { showMobile.value = false }
 const navItems = [
-  { path: '/admin', label: 'Dashboard', color: '#34c759', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>' },
-  { path: '/admin/settings', label: 'Settings', color: '#8e8e93', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>' },
-  { path: '/admin/rewards', label: 'Rewards', color: '#ff9500', svg: '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13h24v15H4zM2 8h28v7H2zM16 8v20M16 8c-1-5-8-7-8-2 0 3 5 3 8 2Zm0 0c1-5 8-7 8-2 0 3-5 3-8 2Z"/></svg>' },
+  { path: '/admin', label: 'Dashboard', color: '#6366f1', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg>' },
+  { path: '/admin/settings', label: 'Settings', color: '#8b5cf6', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21H9.6v-.09A1.7 1.7 0 0 0 8.5 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H3V9.6h.09A1.7 1.7 0 0 0 4.6 8.5a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V3h4v.09A1.7 1.7 0 0 0 15.5 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06A1.7 1.7 0 0 0 19.4 9c.2.4.6.8 1 1 .3.2.7.3 1.1.3h.1v4h-.09A1.7 1.7 0 0 0 19.4 15Z"/></svg>' },
+  { path: '/admin/rewards', label: 'Rewards', color: '#f59e0b', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10h18v11H3zM2 6h20v4H2zM12 6v15M12 6c-1-4-6-5-6-2 0 2 4 3 6 2Zm0 0c1-4 6-5 6-2 0 2-4 3-6 2Z"/></svg>' },
+  { path: '/admin/upload', label: 'Upload', color: '#06b6d4', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M5 14v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></svg>' },
 ]
 </script>
 <template>
@@ -23,12 +24,12 @@ const navItems = [
       </div>
       <nav class="admin-nav">
         <router-link v-for="item in navItems" :key="item.path" :to="item.path" :class="{ active: isActive(item.path) }">
-          <span class="nav-icon" :style="{ color: item.color }" v-html="item.svg"></span>
+          <span class="nav-icon" :style="{ color: item.color, backgroundColor: item.color + '18' }" v-html="item.svg"></span>
           {{ item.label }}
         </router-link>
       </nav>
       <div class="admin-sidebar-footer">
-        <a @click="logout" v-html='`<svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Logout`'></a>
+        <a @click="logout"><span class="logout-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/><path d="M14 3h5a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-5"/></svg></span><span>Logout</span></a>
       </div>
     </aside>
 
@@ -45,12 +46,12 @@ const navItems = [
         </div>
         <nav class="admin-nav">
           <router-link v-for="item in navItems" :key="item.path" :to="item.path" :class="{ active: isActive(item.path) }" @click="closeMobile">
-            <span class="nav-icon" :style="{ color: item.color }" v-html="item.svg"></span>
+            <span class="nav-icon" :style="{ color: item.color, backgroundColor: item.color + '18' }" v-html="item.svg"></span>
             {{ item.label }}
           </router-link>
         </nav>
         <div class="admin-sidebar-footer">
-          <a @click="logout; closeMobile()" v-html='`<svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Logout`'></a>
+          <a @click="logout(); closeMobile()"><span class="logout-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/><path d="M14 3h5a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-5"/></svg></span><span>Logout</span></a>
         </div>
       </aside>
     </div>
@@ -78,14 +79,14 @@ const navItems = [
 .mobile-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,.2); backdrop-filter: blur(4px); }
 .mobile-sidebar { position: absolute; top: 0; left: 0; width: 260px; height: 100vh; display: flex; flex-direction: column; background: var(--admin-sidebar); }
 .mobile-sidebar-header { padding: 16px 16px 12px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--admin-border); }
-.mobile-sidebar-header .logo { width: 30px; height: 30px; border-radius: 8px; background: linear-gradient(135deg,#34c759,#28a745); display: grid; place-items: center; flex-shrink: 0; }
+.mobile-sidebar-header .logo { width: 34px; height: 34px; border-radius: 11px; background: linear-gradient(145deg,#7c3aed,#4f46e5); display: grid; place-items: center; flex-shrink: 0; box-shadow: 0 7px 18px rgba(79,70,229,.35); }
 .mobile-sidebar-header .logo svg { width: 16px; height: 16px; color: #fff; }
 .mobile-sidebar-header span { flex: 1; color: var(--admin-text); font-size: 15px; font-weight: 700; }
 @media (max-width:768px) {
   .admin-sidebar { display: none; }
   .admin-main-wrap { margin-left: 0; }
   .admin-mobile-header { display: flex; position: sticky; top: 0; z-index: 20; height: 52px; align-items: center; gap: 10px; padding: 0 16px; background: var(--admin-sidebar); border-bottom: 1px solid var(--admin-border); }
-  .admin-mobile-header .logo { width: 26px; height: 26px; border-radius: 6px; background: linear-gradient(135deg,#34c759,#28a745); display: grid; place-items: center; flex-shrink: 0; }
+  .admin-mobile-header .logo { width: 30px; height: 30px; border-radius: 9px; background: linear-gradient(145deg,#7c3aed,#4f46e5); display: grid; place-items: center; flex-shrink: 0; box-shadow: 0 6px 15px rgba(79,70,229,.3); }
   .admin-mobile-header .logo svg { width: 14px; height: 14px; color: #fff; }
   .admin-mobile-header span { font-size: 14px; font-weight: 700; color: var(--admin-text); }
   .mobile-hamburger { display: block; }
