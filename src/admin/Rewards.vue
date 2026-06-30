@@ -9,8 +9,49 @@ const loading = ref(true)
 const error = ref('')
 const toast = ref('')
 const busySlots = ref({})
+const uploadProgress = ref({})
 let toastTimer = null
 function showToast(msg) { toast.value = msg; clearTimeout(toastTimer); toastTimer = setTimeout(() => toast.value = '', 3000) }
+
+function normalizeUploadUrl(data) {
+  const payload = data?.data && typeof data.data === 'object' ? data.data : data
+  const raw = payload?.url || payload?.image_url || payload?.path || payload?.file || payload?.filename || payload?.name || ''
+  if (!raw) return ''
+  if (/^https?:\/\//i.test(raw)) return raw
+  const file = String(raw).replace(/^\/+/, '').replace(/^uploads\/+/i, '')
+  return `https://app.nexapk.in/uploads/${file}`
+}
+
+function uploadFileWithProgress(file, slotId) {
+  return new Promise((resolve, reject) => {
+    const fd = new FormData()
+    fd.append('key', API_KEY)
+    fd.append('image', file)
+    uploadProgress.value = { ...uploadProgress.value, [slotId]: 1 }
+    const xhr = new XMLHttpRequest()
+    xhr.open('POST', UPLOAD_API)
+    xhr.upload.onprogress = (event) => {
+      if (!event.lengthComputable) return
+      const pct = Math.max(1, Math.min(99, Math.round((event.loaded / event.total) * 100)))
+      uploadProgress.value = { ...uploadProgress.value, [slotId]: pct }
+    }
+    xhr.onerror = () => reject(new Error('Upload error'))
+    xhr.onload = () => {
+      try {
+        const data = JSON.parse(xhr.responseText || '{}')
+        if (xhr.status < 200 || xhr.status >= 300 || data.success === false) {
+          reject(new Error(data.error || data.message || 'Upload failed'))
+          return
+        }
+        uploadProgress.value = { ...uploadProgress.value, [slotId]: 100 }
+        resolve(data)
+      } catch {
+        reject(new Error('Invalid upload response'))
+      }
+    }
+    xhr.send(fd)
+  })
+}
 
 async function loadRewards(forceRefresh = false) {
   error.value = ''
@@ -45,6 +86,7 @@ async function saveSlot(slot, imageUrl) {
     })
     const data = await res.json()
     if (data.status !== 'success') throw new Error(data.message || 'Failed')
+    if (Array.isArray(data.rewards)) rewards.value = data.rewards.slice(0, 6)
     showToast(imageUrl ? 'Uploaded and saved!' : 'Image removed!')
   } catch {
     slot.image_url = previous
@@ -53,6 +95,9 @@ async function saveSlot(slot, imageUrl) {
     const next = { ...busySlots.value }
     delete next[slot.id]
     busySlots.value = next
+    const progress = { ...uploadProgress.value }
+    delete progress[slot.id]
+    uploadProgress.value = progress
   }
 }
 
@@ -95,16 +140,21 @@ function pickUpload(slot) {
   input.onchange = async (e) => {
     const file = e.target.files[0]
     if (!file) return
-    const fd = new FormData()
-    fd.append('key', API_KEY)
-    fd.append('image', file)
     try {
-      const res = await fetch(UPLOAD_API, { method: 'POST', body: fd })
-      const data = await res.json()
-      if (data.success) {
-        await saveSlot(slot, data.url)
-      } else showToast(data.error || 'Failed')
-    } catch { showToast('Upload error') }
+      busySlots.value = { ...busySlots.value, [slot.id]: true }
+      const data = await uploadFileWithProgress(file, slot.id)
+      const fullUrl = normalizeUploadUrl(data)
+      if (!fullUrl) throw new Error('Upload link missing')
+      await saveSlot(slot, fullUrl)
+    } catch (err) {
+      showToast(err?.message || 'Upload error')
+      const next = { ...busySlots.value }
+      delete next[slot.id]
+      busySlots.value = next
+      const progress = { ...uploadProgress.value }
+      delete progress[slot.id]
+      uploadProgress.value = progress
+    }
   }
   input.click()
 }
@@ -129,7 +179,10 @@ function deleteImg(slot) {
       <div class="slot-img-wrap" @click="pickUpload(r)">
         <img v-if="r.image_url" :src="r.image_url" :alt="'Slot ' + r.slot_id" loading="lazy">
         <div v-else class="slot-empty">No Image</div>
-        <div class="slot-overlay"><span>{{ busySlots[r.id] ? 'Saving...' : 'Tap to Upload' }}</span></div>
+        <div class="slot-overlay" :class="{ visible: busySlots[r.id] }">
+          <span>{{ uploadProgress[r.id] ? `Uploading ${uploadProgress[r.id]}%` : (busySlots[r.id] ? 'Saving...' : 'Tap to Upload') }}</span>
+          <div v-if="uploadProgress[r.id]" class="slot-progress"><i :style="{ width: uploadProgress[r.id] + '%' }"></i></div>
+        </div>
       </div>
       <button class="slot-delete" :disabled="busySlots[r.id] || !r.image_url" @click="deleteImg(r)">{{ busySlots[r.id] ? 'Saving...' : 'Delete' }}</button>
     </div>
@@ -151,7 +204,9 @@ function deleteImg(slot) {
 .slot-empty { width: 100%; height: 100%; display: grid; place-items: center; color: var(--admin-text-secondary); font-size: 13px; font-weight: 800; background: repeating-linear-gradient(135deg,#f8fafc 0 12px,#eef2f7 12px 24px); }
 .slot-overlay { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(0,0,0,.45); opacity: 0; transition: opacity .2s; }
 .slot-overlay span { color: #fff; font-size: 12px; font-weight: 600; background: rgba(0,0,0,.55); padding: 6px 14px; border-radius: 999px; }
-.slot-img-wrap:hover .slot-overlay { opacity: 1; }
+.slot-overlay.visible,.slot-img-wrap:hover .slot-overlay { opacity: 1; }
+.slot-progress { align-self: start; width: 72%; height: 7px; margin-top: -42px; overflow: hidden; border-radius: 999px; background: rgba(255,255,255,.24); }
+.slot-progress i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg,#44C965,#a7f3d0); transition: width .18s ease; }
 .slot-delete { width: 100%; padding: 8px; border: 0; border-top: 1px solid var(--admin-border); font-size: 12px; font-weight: 600; color: var(--admin-red); background: transparent; cursor: pointer; }
 .slot-delete:hover { background: rgba(255,59,48,.06); }
 .slot-delete:disabled { color: #a6acba; cursor: not-allowed; background: #f7f8fb; }

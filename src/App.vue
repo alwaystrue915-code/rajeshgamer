@@ -52,7 +52,7 @@ async function fetchRewards({ silent = false } = {}) {
     if (data.status !== 'success') throw new Error('API returned an error')
     settings.value = { ...settings.value, ...(data.settings || {}) }
     rewards.value = (data.rewards || [])
-      .filter((reward) => reward?.id && reward?.image_url)
+      .filter((reward) => reward?.id)
       .slice(0, 6)
     selectedRewards.value = selectedRewards.value.filter((id) => rewards.value.some((reward) => reward.id === id))
     rewards.value.forEach((r) => {
@@ -185,7 +185,8 @@ onUnmounted(() => {
         >
           <article class="reward-card" :class="{ selected: isSelected(reward.id) }" :style="{ '--delay': `${index * 60}ms` }" @click="toggleReward(reward.id)">
             <div class="reward-art reward-image">
-              <img :src="reward.image_url" :alt="`Reward ${reward.slot_id}`" loading="lazy" decoding="async" :fetchpriority="index < 3 ? 'high' : 'auto'">
+              <img v-if="reward.image_url" :src="reward.image_url" :alt="`Reward ${reward.slot_id}`" loading="lazy" decoding="async" :fetchpriority="index < 3 ? 'high' : 'auto'">
+              <div v-else class="reward-empty-public">No Image</div>
             </div>
             <button class="claim-small" type="button" @click.stop="toggleReward(reward.id)">
               {{ isSelected(reward.id) ? 'SELECTED' : 'CLAIM' }}
