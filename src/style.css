@@ -299,6 +299,44 @@ body { background: #050505; }
 .event-card .reward-electric,
 .event-card .reward-card { min-width: 0; width: 100%; }
 
+/* Final public grid lock: root + /app show tight 3-column API rewards */
+.page-shell,
+.event-card {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+.event-card .rewards,
+.theme-blue .rewards,
+.theme-dark .rewards {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+  overflow: visible !important;
+  padding-bottom: 0 !important;
+}
+
+.event-card .reward-electric,
+.event-card .reward-electric .reward-card {
+  width: 100% !important;
+  min-width: 0;
+  scroll-snap-align: none;
+}
+
+@media (max-width: 620px) {
+  .theme-blue,
+  .theme-dark {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .event-card .rewards,
+  .theme-blue .rewards,
+  .theme-dark .rewards {
+    gap: 6px !important;
+  }
+}
+
 /* /app gets a distinct tactical success popup and motion */
 .page-dark .success-modal {
   width: min(320px,88vw); padding: 58px 20px 22px; overflow: visible; border: 1px solid #ffbd00; border-radius: 0;

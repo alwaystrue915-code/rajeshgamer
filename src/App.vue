@@ -1,10 +1,13 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import ElectricBorder from './components/ElectricBorder.vue'
+import { useSocket } from './composables/useSocket'
 const route = useRoute()
+const socket = useSocket()
 
 const API_URL = 'https://app.nexapk.in/rajesh/api.php'
+const API_PAYLOAD = { username: 'rajesh', game: 'freefire' }
 const rewards = ref([])
 const settings = ref({ claim_mode: 'popup', redirect_url: '', popup_message: 'Your rewards will be sent to your mailbox.' })
 const loading = ref(true)
@@ -36,7 +39,16 @@ async function fetchRewards() {
   const controller = new AbortController()
   const timeout = setTimeout(() => controller.abort(), 8000)
   try {
-    const response = await fetch(API_URL, { signal: controller.signal, cache: 'no-store', headers: { Accept: 'application/json' } })
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      signal: controller.signal,
+      cache: 'no-store',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(API_PAYLOAD),
+    })
     if (!response.ok) throw new Error(`HTTP ${response.status}`)
     const data = await response.json()
     if (data.status !== 'success') throw new Error('API returned an error')
@@ -115,7 +127,21 @@ function claimRewards() {
   showSuccess.value = true
 }
 
-onMounted(() => { preconnectDomains(); fetchRewards() })
+function refreshRewardsRealtime() {
+  fetchRewards()
+}
+
+onMounted(() => {
+  preconnectDomains()
+  fetchRewards()
+  socket.on('rewards:updated', refreshRewardsRealtime)
+  socket.on('settings:updated', refreshRewardsRealtime)
+})
+
+onUnmounted(() => {
+  socket.off('rewards:updated', refreshRewardsRealtime)
+  socket.off('settings:updated', refreshRewardsRealtime)
+})
 </script>
 
 <template>
