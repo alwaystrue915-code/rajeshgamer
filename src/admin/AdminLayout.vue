@@ -39,9 +39,7 @@ const navItems = [
         <div class="mobile-sidebar-header">
           <div class="logo" v-html='`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`'></div>
           <span>Admin Panel</span>
-          <button class="mobile-close" @click="closeMobile">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-          </button>
+          <button class="mobile-close" @click="closeMobile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
         </div>
         <nav class="admin-nav">
           <router-link v-for="item in navItems" :key="item.path" :to="item.path" :class="{ active: isActive(item.path) }" @click="closeMobile">
@@ -58,9 +56,7 @@ const navItems = [
     <!-- Main Content -->
     <div class="admin-main-wrap">
       <header class="admin-mobile-header">
-        <button class="mobile-hamburger" @click="showMobile = true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-        </button>
+        <button class="mobile-hamburger" @click="showMobile = true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
         <div class="logo" v-html='`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`'></div>
         <span>Admin Panel</span>
       </header>
@@ -72,24 +68,29 @@ const navItems = [
 </template>
 
 <style scoped>
-.mobile-hamburger { display: none; background: none; border: 0; padding: 0; width: 24px; height: 24px; color: var(--admin-text); cursor: pointer; flex-shrink: 0; }
-.mobile-close { background: none; border: 0; padding: 0; width: 22px; height: 22px; color: var(--admin-text-secondary); cursor: pointer; flex-shrink: 0; }
-.mobile-close svg, .mobile-hamburger svg { width: 100%; height: 100%; display: block; }
-.mobile-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,.2); backdrop-filter: blur(4px); }
-.mobile-sidebar { position: absolute; top: 0; left: 0; width: 260px; height: 100vh; display: flex; flex-direction: column; background: var(--admin-sidebar); }
-.mobile-sidebar-header { padding: 16px 16px 12px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--admin-border); }
-.mobile-sidebar-header .logo { width: 34px; height: 34px; border-radius: 11px; background: #44C965; display: grid; place-items: center; flex-shrink: 0; box-shadow: 0 7px 18px rgba(68,201,101,.28); }
-.mobile-sidebar-header .logo svg { width: 16px; height: 16px; color: #fff; }
-.mobile-sidebar-header span { flex: 1; color: var(--admin-text); font-size: 15px; font-weight: 700; }
+.mobile-backdrop { position: absolute; inset: 0; background: rgba(15,23,42,.55); backdrop-filter: blur(4px); }
+.mobile-sidebar { position: absolute; top: 0; left: 0; width: 260px; height: 100vh; display: flex; flex-direction: column; background: #fcfcfd; animation: admin-slide .25s ease; }
+.mobile-sidebar-header { padding: 16px 18px 18px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #eceef3; }
+.mobile-sidebar-header .logo { width: 38px; height: 38px; border-radius: 12px; background: #44C965; display: grid; place-items: center; flex-shrink: 0; box-shadow: 0 7px 18px rgba(68,201,101,.27); }
+.mobile-sidebar-header .logo svg { width: 20px; height: 20px; color: #fff; }
+.mobile-sidebar-header span { flex: 1; color: #202333; font-size: 16px; font-weight: 900; }
+.mobile-close { flex-shrink: 0; width: 22px; height: 22px; padding: 0; border: 0; background: none; color: #555b6c; cursor: pointer; }
+.mobile-close svg { width: 100%; height: 100%; display: block; }
+.mobile-overlay { position: fixed; z-index: 999; inset: 0; animation: admin-fade .2s ease; }
+.mobile-hamburger { flex-shrink: 0; width: 36px; height: 36px; padding: 0; margin-left: -4px; border: 0; border-radius: 10px; background: transparent; color: var(--admin-text); cursor: pointer; display: grid; place-items: center; }
+.mobile-hamburger:hover { background: rgba(0,0,0,.04); }
+.mobile-hamburger svg { width: 22px; height: 22px; display: block; }
+@keyframes admin-fade { from { opacity: 0; } }
+@keyframes admin-slide { from { transform: translateX(-100%); } }
 @media (max-width:768px) {
   .admin-sidebar { display: none; }
   .admin-main-wrap { margin-left: 0; }
-  .admin-mobile-header { display: flex; position: sticky; top: 0; z-index: 20; height: 52px; align-items: center; gap: 10px; padding: 0 16px; background: var(--admin-sidebar); border-bottom: 1px solid var(--admin-border); }
-  .admin-mobile-header .logo { width: 30px; height: 30px; border-radius: 9px; background: #44C965; display: grid; place-items: center; flex-shrink: 0; box-shadow: 0 6px 15px rgba(68,201,101,.25); }
-  .admin-mobile-header .logo svg { width: 14px; height: 14px; color: #fff; }
-  .admin-mobile-header span { font-size: 14px; font-weight: 700; color: var(--admin-text); }
-  .mobile-hamburger { display: block; }
-  .mobile-overlay { position: fixed; z-index: 999; inset: 0; }
-  .admin-main { padding: 20px 16px; }
+  .admin-mobile-header { display: flex; position: sticky; top: 0; z-index: 20; height: 56px; align-items: center; gap: 6px; padding: 0 12px; background: rgba(246,247,251,.8); backdrop-filter: blur(18px); border-bottom: 1px solid rgba(0,0,0,.05); }
+  .admin-mobile-header .logo { width: 30px; height: 30px; border-radius: 9px; background: #44C965; display: grid; place-items: center; flex-shrink: 0; box-shadow: 0 5px 12px rgba(68,201,101,.22); }
+  .admin-mobile-header .logo svg { width: 16px; height: 16px; color: #fff; }
+  .admin-mobile-header span { font-size: 14px; font-weight: 800; color: var(--admin-text); letter-spacing: -.2px; }
+  .mobile-sidebar { width: min(290px,86vw); padding: 12px; box-sizing: border-box; }
+  .mobile-sidebar-header { padding: 8px 6px 18px !important; }
+  .admin-main { padding: 26px 18px 40px !important; }
 }
 </style>
