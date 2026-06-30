@@ -13,7 +13,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const prisma = new PrismaClient()
 const app = express()
 const httpServer = createServer(app)
-const io = new Server(httpServer, { cors: { origin: '*', methods: ['GET', 'POST'] } })
+const io = new Server(httpServer, { cors: { origin: '*', methods: ['GET', 'POST', 'PUT', 'DELETE'] } })
 const PORT = process.env.PORT || 3000
 
 app.use(cors())
@@ -22,8 +22,6 @@ app.use(express.json())
 function hashPassword(pw) {
   return crypto.createHash('sha256').update(pw + 'premium-rewards-salt').digest('hex')
 }
-
-const PUBLIC_API = 'https://app.nexapk.in/rajesh/api.php'
 
 io.on('connection', (socket) => {
   console.log('Admin connected:', socket.id)
@@ -79,22 +77,59 @@ app.put('/api/admin/settings', async (req, res) => {
   } catch { res.status(500).json({ status: 'error', message: 'Failed to save.' }) }
 })
 
+function mapReward(r) {
+  return { id: r.rewardId, image_url: r.imageUrl, slot_id: r.slotId }
+}
+
+async function getCachedRewards() {
+  const rows = await prisma.reward.findMany({ orderBy: { slotId: 'asc' } })
+  return rows.map(mapReward)
+}
+
+async function ensureFallbackSlots() {
+  for (let i = 1; i <= 6; i += 1) {
+    const id = `slot-${i}`
+    const existing = await prisma.reward.findFirst({ where: { rewardId: id } })
+    if (!existing) await prisma.reward.create({ data: { rewardId: id, slotId: String(i), imageUrl: '' } })
+  }
+  return getCachedRewards()
+}
+
 app.get('/api/rewards', async (req, res) => {
   try {
-    const resp = await fetch(PUBLIC_API, { cache: 'no-store' })
-    const data = await resp.json()
-    if (data.status === 'success') {
-      const rewards = (data.rewards || []).filter(r => r?.id)
-      await prisma.reward.deleteMany()
-      for (const r of rewards) {
-        await prisma.reward.create({ data: { rewardId: String(r.id), imageUrl: r.image_url, slotId: String(r.slot_id) } })
-      }
-      io.emit('rewards:updated', rewards)
-      return res.json({ status: 'success', rewards })
-    }
-    const cached = await prisma.reward.findMany()
-    res.json({ status: 'success', rewards: cached.map(r => ({ id: r.rewardId, image_url: r.imageUrl, slot_id: r.slotId })) })
+    let rewards = await getCachedRewards()
+    if (!rewards.length) rewards = await ensureFallbackSlots()
+    res.json({ status: 'success', rewards })
   } catch { res.status(500).json({ status: 'error', message: 'Failed.' }) }
+})
+
+app.put('/api/admin/rewards/:id', async (req, res) => {
+  try {
+    const id = String(req.params.id)
+    const imageUrl = req.body.image_url === null ? '' : String(req.body.image_url || '')
+    const slotId = String(req.body.slot_id || '')
+    const existing = await prisma.reward.findFirst({ where: { rewardId: id } })
+    if (!existing) return res.status(404).json({ status: 'error', message: 'Reward not found.' })
+    await prisma.reward.update({
+      where: { id: existing.id },
+      data: { imageUrl, slotId: slotId || existing.slotId },
+    })
+    const rewards = await getCachedRewards()
+    io.emit('rewards:updated', rewards)
+    res.json({ status: 'success', rewards })
+  } catch { res.status(500).json({ status: 'error', message: 'Failed to update reward.' }) }
+})
+
+app.delete('/api/admin/rewards/:id', async (req, res) => {
+  try {
+    const id = String(req.params.id)
+    const existing = await prisma.reward.findFirst({ where: { rewardId: id } })
+    if (!existing) return res.status(404).json({ status: 'error', message: 'Reward not found.' })
+    await prisma.reward.update({ where: { id: existing.id }, data: { imageUrl: '' } })
+    const rewards = await getCachedRewards()
+    io.emit('rewards:updated', rewards)
+    res.json({ status: 'success', rewards })
+  } catch { res.status(500).json({ status: 'error', message: 'Failed to delete reward image.' }) }
 })
 
 const distPath = path.join(__dirname, 'dist')

@@ -6,8 +6,7 @@ import { useSocket } from './composables/useSocket'
 const route = useRoute()
 const socket = useSocket()
 
-const API_URL = 'https://app.nexapk.in/rajesh/api.php'
-const API_PAYLOAD = { username: 'rajesh', game: 'freefire' }
+const API_URL = '/api/rewards'
 const rewards = ref([])
 const settings = ref({ claim_mode: 'popup', redirect_url: '', popup_message: 'Your rewards will be sent to your mailbox.' })
 const loading = ref(true)
@@ -33,21 +32,20 @@ function preconnectDomains() {
   })
 }
 
-async function fetchRewards() {
-  loading.value = true
+let rewardRefreshTimer = null
+let rewardsRequest = null
+
+async function fetchRewards({ silent = false } = {}) {
+  if (rewardsRequest) return rewardsRequest
+  if (!silent) loading.value = true
   loadError.value = false
   const controller = new AbortController()
   const timeout = setTimeout(() => controller.abort(), 8000)
-  try {
+  rewardsRequest = (async () => {
     const response = await fetch(API_URL, {
-      method: 'POST',
       signal: controller.signal,
       cache: 'no-store',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(API_PAYLOAD),
+      headers: { Accept: 'application/json' },
     })
     if (!response.ok) throw new Error(`HTTP ${response.status}`)
     const data = await response.json()
@@ -68,11 +66,15 @@ async function fetchRewards() {
         }
       } catch {}
     })
+  })()
+  try {
+    await rewardsRequest
   } catch {
     loadError.value = true
   } finally {
     clearTimeout(timeout)
-    loading.value = false
+    rewardsRequest = null
+    if (!silent) loading.value = false
   }
 }
 
@@ -128,7 +130,8 @@ function claimRewards() {
 }
 
 function refreshRewardsRealtime() {
-  fetchRewards()
+  clearTimeout(rewardRefreshTimer)
+  rewardRefreshTimer = setTimeout(() => fetchRewards({ silent: true }), 700)
 }
 
 onMounted(() => {
@@ -139,6 +142,7 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
+  clearTimeout(rewardRefreshTimer)
   socket.off('rewards:updated', refreshRewardsRealtime)
   socket.off('settings:updated', refreshRewardsRealtime)
 })

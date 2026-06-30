@@ -263,6 +263,10 @@
     box-shadow: 0 8px 18px rgba(68,201,101,.26) !important;
   }
 
+  .admin-mobile-header .logo {
+    display: none !important;
+  }
+
   .mobile-hamburger:hover {
     background: #3abd5d !important;
   }
@@ -294,4 +298,30 @@
   .mobile-sidebar-header span {
     color: #202333 !important;
   }
+}
+
+/* Final desktop overflow guard */
+.admin-shell,
+.admin-main-wrap,
+.admin-main,
+.admin-sidebar,
+.mobile-sidebar,
+.admin-nav {
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: hidden !important;
+}
+
+.admin-sidebar {
+  box-sizing: border-box;
+}
+
+.admin-nav a {
+  max-width: 100%;
+  box-sizing: border-box;
+  transform: none !important;
+}
+
+.admin-nav a.active::before {
+  left: 0 !important;
 }
