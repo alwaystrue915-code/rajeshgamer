@@ -147,6 +147,60 @@ app.delete('/api/admin/rewards/:id', async (req, res) => {
   } catch { res.status(500).json({ status: 'error', message: 'Failed to delete reward image.' }) }
 })
 
+app.get('/api/admin/keys', async (req, res) => {
+  try {
+    const keys = await prisma.generatedKey.findMany({ orderBy: { createdAt: 'desc' } })
+    res.json({ status: 'success', keys: keys.map(k => ({ id: String(k.id), key: k.key, device_id: k.deviceId || null, is_active: k.isActive, created_at: k.createdAt })) })
+  } catch { res.status(500).json({ status: 'error', message: 'Failed to load keys.' }) }
+})
+
+app.post('/api/admin/keys', async (req, res) => {
+  try {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+    let key = 'FF-'
+    for (let i = 0; i < 3; i++) { for (let j = 0; j < 4; j++) key += chars[Math.floor(Math.random() * chars.length)]; if (i < 2) key += '-' }
+    await prisma.generatedKey.create({ data: { key } })
+    const keys = await prisma.generatedKey.findMany({ orderBy: { createdAt: 'desc' } })
+    io.emit('keys:updated')
+    res.json({ status: 'success', keys: keys.map(k => ({ id: String(k.id), key: k.key, device_id: k.deviceId || null, is_active: k.isActive, created_at: k.createdAt })) })
+  } catch { res.status(500).json({ status: 'error', message: 'Failed to generate key.' }) }
+})
+
+app.put('/api/admin/keys/:id/toggle', async (req, res) => {
+  try {
+    const id = Number(req.params.id)
+    const existing = await prisma.generatedKey.findUnique({ where: { id } })
+    if (!existing) return res.status(404).json({ status: 'error', message: 'Key not found.' })
+    await prisma.generatedKey.update({ where: { id }, data: { isActive: !existing.isActive } })
+    const keys = await prisma.generatedKey.findMany({ orderBy: { createdAt: 'desc' } })
+    io.emit('keys:updated')
+    res.json({ status: 'success', keys: keys.map(k => ({ id: String(k.id), key: k.key, device_id: k.deviceId || null, is_active: k.isActive, created_at: k.createdAt })) })
+  } catch { res.status(500).json({ status: 'error', message: 'Failed to toggle key.' }) }
+})
+
+app.delete('/api/admin/keys/:id', async (req, res) => {
+  try {
+    const id = Number(req.params.id)
+    await prisma.generatedKey.delete({ where: { id } })
+    const keys = await prisma.generatedKey.findMany({ orderBy: { createdAt: 'desc' } })
+    io.emit('keys:updated')
+    res.json({ status: 'success', keys: keys.map(k => ({ id: String(k.id), key: k.key, device_id: k.deviceId || null, is_active: k.isActive, created_at: k.createdAt })) })
+  } catch { res.status(500).json({ status: 'error', message: 'Failed to delete key.' }) }
+})
+
+app.post('/api/validate-key', async (req, res) => {
+  try {
+    const { key, device_id } = req.body
+    if (!key || !device_id) return res.json({ status: 'error', message: 'Key and device ID required.' })
+    const record = await prisma.generatedKey.findUnique({ where: { key: key.trim().toUpperCase() } })
+    if (!record) return res.json({ status: 'error', message: 'Invalid key.' })
+    if (!record.isActive) return res.json({ status: 'error', message: 'Key is deactivated.' })
+    if (record.deviceId && record.deviceId !== device_id) return res.json({ status: 'error', message: 'Key already in use on another device.' })
+    if (!record.deviceId) await prisma.generatedKey.update({ where: { id: record.id }, data: { deviceId: device_id } })
+    res.json({ status: 'success', message: 'Access granted.' })
+  } catch { res.json({ status: 'error', message: 'Validation failed.' }) }
+})
+
 const distPath = path.join(__dirname, 'dist')
 app.use(express.static(distPath))
 app.use((req, res, next) => {

@@ -20,6 +20,12 @@ const statusType = ref('')
 const showSuccess = ref(false)
 const isDarkRoute = computed(() => window.location.pathname === '/app' || window.location.pathname.startsWith('/app/'))
 
+const accessGranted = ref(!!sessionStorage.getItem('access_granted'))
+const keyInput = ref('')
+const keyError = ref('')
+const keyLoading = ref(false)
+const deviceId = ref('')
+
 function preconnectDomains() {
   ;['https://fonts.googleapis.com', 'https://fonts.gstatic.com', 'https://app.nexapk.in'].forEach((url) => {
     if (!document.querySelector(`link[rel="preconnect"][href="${url}"]`)) {
@@ -30,6 +36,49 @@ function preconnectDomains() {
       document.head.appendChild(link)
     }
   })
+}
+
+function getCookie(name) {
+  const m = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'))
+  return m ? decodeURIComponent(m[2]) : null
+}
+
+function setCookie(name, value, days) {
+  const d = new Date()
+  d.setTime(d.getTime() + days * 86400000)
+  document.cookie = name + '=' + encodeURIComponent(value) + '; expires=' + d.toUTCString() + '; path=/'
+}
+
+function ensureDeviceId() {
+  let id = getCookie('device_id')
+  if (!id) {
+    id = crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16) })
+    setCookie('device_id', id, 365)
+  }
+  deviceId.value = id
+}
+
+async function submitKey() {
+  const val = keyInput.value.trim()
+  if (!val) { keyError.value = 'Enter a key.'; return }
+  keyLoading.value = true
+  keyError.value = ''
+  try {
+    const res = await fetch('/api/validate-key', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key: val, device_id: deviceId.value }),
+    })
+    const data = await res.json()
+    if (data.status === 'success') {
+      sessionStorage.setItem('access_granted', '1')
+      accessGranted.value = true
+      fetchRewards()
+    } else {
+      keyError.value = data.message || 'Invalid key.'
+    }
+  } catch { keyError.value = 'Network error.' }
+  finally { keyLoading.value = false }
 }
 
 let rewardRefreshTimer = null
@@ -133,8 +182,11 @@ function refreshRewardsRealtime() {
 }
 
 onMounted(() => {
-  preconnectDomains()
-  fetchRewards()
+  ensureDeviceId()
+  if (accessGranted.value) {
+    preconnectDomains()
+    fetchRewards()
+  }
   socket.on('rewards:updated', refreshRewardsRealtime)
   socket.on('settings:updated', (s) => { if (s) settings.value = { ...settings.value, ...s } })
 })
@@ -148,6 +200,18 @@ onUnmounted(() => {
 
 <template>
   <router-view v-if="route.path.startsWith('/admin')" />
+  <main v-else-if="!accessGranted" class="page-shell key-gate" :class="isDarkRoute ? 'page-dark' : 'page-blue'">
+    <div class="key-gate-card">
+      <div class="key-gate-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+      <h1>Access Required</h1>
+      <p class="key-gate-sub">Enter your access key to continue</p>
+      <form @submit.prevent="submitKey" class="key-gate-form">
+        <input v-model="keyInput" placeholder="Enter your key (e.g. FF-XXXX-XXXX-XXXX)" autocomplete="off" spellcheck="false">
+        <button type="submit" :disabled="keyLoading">{{ keyLoading ? 'Verifying...' : 'Unlock' }}</button>
+      </form>
+      <p v-if="keyError" class="key-gate-error">{{ keyError }}</p>
+    </div>
+  </main>
   <main v-else class="page-shell" :class="isDarkRoute ? 'page-dark' : 'page-blue'">
     <section class="event-card" :class="isDarkRoute ? 'theme-dark' : 'theme-blue'">
       <header v-if="!isDarkRoute" class="hero">
@@ -227,3 +291,23 @@ onUnmounted(() => {
     </Transition>
   </main>
 </template>
+
+<style scoped>
+.key-gate { display: grid; place-items: center; min-height: 100dvh; padding: 24px; box-sizing: border-box; }
+.key-gate-card { width: 100%; max-width: 400px; padding: 40px 32px; border-radius: 24px; background: rgba(255,255,255,.96); box-shadow: 0 8px 40px rgba(0,0,0,.12); text-align: center; }
+.page-dark .key-gate-card { background: rgba(30,30,32,.96); box-shadow: 0 8px 40px rgba(0,0,0,.4); }
+.key-gate-icon { width: 56px; height: 56px; margin: 0 auto 18px; border-radius: 50%; display: grid; place-items: center; background: linear-gradient(135deg,#6366f1,#8b5cf6); color: #fff; }
+.key-gate-icon svg { width: 26px; height: 26px; }
+.key-gate-card h1 { margin: 0 0 6px; font-size: 22px; font-weight: 900; color: #1a1a2e; }
+.page-dark .key-gate-card h1 { color: #eee; }
+.key-gate-sub { margin: 0 0 24px; font-size: 14px; color: #6b7280; }
+.page-dark .key-gate-sub { color: #9ca3af; }
+.key-gate-form { display: flex; flex-direction: column; gap: 12px; }
+.key-gate-form input { width: 100%; padding: 14px 16px; border: 2px solid #e5e7eb; border-radius: 14px; font-size: 14px; font-weight: 600; text-align: center; letter-spacing: .5px; background: #f9fafb; color: #1a1a2e; outline: none; transition: border-color .2s; box-sizing: border-box; }
+.key-gate-form input:focus { border-color: #6366f1; background: #fff; }
+.page-dark .key-gate-form input { background: #27272a; border-color: #3f3f46; color: #eee; }
+.page-dark .key-gate-form input:focus { border-color: #818cf8; background: #2a2a2e; }
+.key-gate-form button { padding: 14px; border: 0; border-radius: 14px; font-size: 15px; font-weight: 800; color: #fff; background: linear-gradient(135deg,#6366f1,#8b5cf6); cursor: pointer; transition: opacity .2s; }
+.key-gate-form button:disabled { opacity: .6; cursor: not-allowed; }
+.key-gate-error { margin: 16px 0 0; font-size: 13px; font-weight: 700; color: #ef4444; }
+</style>

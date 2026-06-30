@@ -4,6 +4,7 @@ import Login from './admin/Login.vue'
 import Dashboard from './admin/Dashboard.vue'
 import Settings from './admin/Settings.vue'
 import Rewards from './admin/Rewards.vue'
+import Keys from './admin/Keys.vue'
 import Upload from './admin/Upload.vue'
 
 function authGuard(to, from, next) {
@@ -21,6 +22,7 @@ const routes = [
       { path: '', name: 'Dashboard', component: Dashboard },
       { path: 'settings', name: 'Settings', component: Settings },
       { path: 'rewards', name: 'Rewards', component: Rewards },
+      { path: 'keys', name: 'Keys', component: Keys },
       { path: 'upload', name: 'Upload', component: Upload },
     ],
   },

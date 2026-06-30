@@ -30,3 +30,12 @@ model Reward {
   createdAt DateTime @default(now()) @map("created_at")
   @@map("rewards")
 }
+
+model GeneratedKey {
+  id        Int      @id @default(autoincrement())
+  key       String   @unique
+  deviceId  String?  @map("device_id")
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+  @@map("generated_keys")
+}
