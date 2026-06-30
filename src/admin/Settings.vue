@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-const settings = ref({ claim_mode: 'popup', redirect_url: '', popup_message: '' })
+const settings = ref({ claim_mode: 'popup', redirect_url: '' })
 const saving = ref(false)
 const toast = ref('')
 let toastTimer = null
@@ -38,10 +38,6 @@ async function save() {
     <div class="field-group">
       <label>Redirect URL</label>
       <input v-model="settings.redirect_url" placeholder="https://example.com" type="url">
-    </div>
-    <div class="field-group">
-      <label>Popup Message</label>
-      <textarea v-model="settings.popup_message" placeholder="Your rewards will be sent to your mailbox."></textarea>
     </div>
   </div>
   <div v-if="toast" style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:12px 24px;border-radius:10px;background:#1c1c1e;color:#fff;font-size:14px;z-index:9999;box-shadow:0 8px 30px rgba(0,0,0,.3)">{{ toast }}</div>

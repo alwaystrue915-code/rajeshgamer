@@ -52,7 +52,7 @@ app.get('/api/admin/settings', async (req, res) => {
 
 app.put('/api/admin/settings', async (req, res) => {
   try {
-    const allowed = ['claim_mode', 'redirect_url', 'popup_message']
+    const allowed = ['claim_mode', 'redirect_url']
     for (const key of allowed) {
       if (req.body[key] !== undefined) {
         await prisma.setting.upsert({

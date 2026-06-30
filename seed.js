@@ -17,7 +17,7 @@ await prisma.adminUser.upsert({
   create: { username, password: hashPassword(password) },
 })
 
-const defaults = { claim_mode: 'popup', redirect_url: '', popup_message: 'Reward claimed!' }
+const defaults = { claim_mode: 'popup', redirect_url: '' }
 for (const [key, value] of Object.entries(defaults)) {
   await prisma.setting.upsert({ where: { key }, update: {}, create: { key, value } })
 }

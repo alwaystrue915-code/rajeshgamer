@@ -13,7 +13,7 @@ onMounted(async () => {
     const res = await fetch('/api/rewards', { cache: 'no-store' })
     const data = await res.json()
     if (data.status === 'success') {
-      const raw = (data.rewards || []).filter(r => r?.id)
+      const raw = (data.rewards || []).filter(r => r?.id).slice(0, 6)
       raw.forEach(r => r.adminImage = null)
       rewards.value = raw
     }
