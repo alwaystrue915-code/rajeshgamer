@@ -215,3 +215,27 @@
   .admin-login-card { padding: 34px 22px; }
   .slot-grid { grid-template-columns: 1fr 1fr; gap: 9px; }
 }
+
+/* Green header + light sidebar palette */
+.admin-sidebar,.mobile-sidebar { color: var(--admin-text); background: #FCFCFD !important; border-right: 1px solid #e7e9ef; box-shadow: 10px 0 30px rgba(28,35,55,.055); }
+.admin-sidebar-header,.mobile-sidebar-header { border-bottom-color: #eceef3 !important; }
+.admin-sidebar-header .logo,.mobile-sidebar-header .logo,.admin-mobile-header .logo { color: #fff !important; background: #44C965 !important; box-shadow: 0 7px 18px rgba(68,201,101,.27) !important; }
+.admin-sidebar-header .logo svg,.mobile-sidebar-header .logo svg,.admin-mobile-header .logo svg { color: #fff !important; stroke: currentColor; }
+.admin-sidebar-header span,.mobile-sidebar-header span { color: #202333 !important; }
+.admin-nav a { color: #72778a; }
+.admin-nav a:hover { color: #202333; background: #f0f8f2; }
+.admin-nav a.active { color: #238a43; background: rgba(68,201,101,.12); box-shadow: inset 0 0 0 1px rgba(68,201,101,.12); }
+.admin-nav a.active::before { background: #44C965; box-shadow: 0 0 10px rgba(68,201,101,.5); }
+.admin-sidebar-footer { border-top-color: #eceef3; }
+.admin-sidebar-footer a { color: #72778a; }
+.admin-sidebar-footer a:hover { color: #dc3545; background: #fff1f2; }
+.admin-mobile-header { color: #fff; background: #44C965 !important; border-bottom-color: rgba(0,0,0,.06) !important; box-shadow: 0 6px 20px rgba(68,201,101,.22) !important; }
+.admin-mobile-header span { color: #fff !important; }
+.admin-mobile-header .logo { background: rgba(255,255,255,.18) !important; border: 1px solid rgba(255,255,255,.28); box-shadow: none !important; }
+.admin-mobile-header .mobile-hamburger { color: #fff !important; }
+.mobile-sidebar .mobile-close { color: #555b6c !important; }
+@media (max-width:768px) {
+  .mobile-sidebar { background: #FCFCFD !important; }
+  .mobile-sidebar .admin-nav a { color: #72778a; }
+  .mobile-sidebar .admin-nav a.active { color: #238a43; background: rgba(68,201,101,.12); }
+}
