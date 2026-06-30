@@ -85,7 +85,7 @@ const navItems = [
 @media (max-width:768px) {
   .admin-sidebar { display: none; }
   .admin-main-wrap { margin-left: 0; }
-  .admin-mobile-header { display: flex; position: sticky; top: 0; z-index: 20; height: 56px; align-items: center; gap: 6px; padding: 0 12px; background: rgba(246,247,251,.8); backdrop-filter: blur(18px); border-bottom: 1px solid rgba(0,0,0,.05); }
+  .admin-mobile-header { display: flex; position: sticky; top: 0; z-index: 20; height: 56px; align-items: center; gap: 6px; padding: 0 12px; background: #F2F2F7; backdrop-filter: blur(18px); border-bottom: 1px solid rgba(0,0,0,.05); }
   .admin-mobile-header .logo { width: 30px; height: 30px; border-radius: 9px; background: #44C965; display: grid; place-items: center; flex-shrink: 0; box-shadow: 0 5px 12px rgba(68,201,101,.22); }
   .admin-mobile-header .logo svg { width: 16px; height: 16px; color: #fff; }
   .admin-mobile-header span { font-size: 14px; font-weight: 800; color: var(--admin-text); letter-spacing: -.2px; }
