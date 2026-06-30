@@ -1,11 +1,10 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-const API = 'https://app.nexapk.in/rajesh/api.php'
 const rewards = ref([])
 const loading = ref(true)
 onMounted(async () => {
   try {
-    const res = await fetch(API, { cache: 'no-store' })
+    const res = await fetch('/api/rewards', { cache: 'no-store' })
     const data = await res.json()
     if (data.status === 'success') rewards.value = (data.rewards || []).filter(r => r?.id)
   } catch {} finally { loading.value = false }

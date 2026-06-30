@@ -11,7 +11,7 @@ async function login() {
   if (!username.value || !password.value) { error.value = 'Fill all fields.'; return }
   loading.value = true
   try {
-    const res = await fetch('https://app.nexapk.in/rajesh/admin_login.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: username.value, password: password.value }) })
+    const res = await fetch('/api/admin/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: username.value, password: password.value }) })
     const data = await res.json()
     if (data.status === 'success') { sessionStorage.setItem('admin_token', data.token || '1'); router.push('/admin') }
     else error.value = data.message || 'Invalid credentials.'

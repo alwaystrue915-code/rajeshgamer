@@ -1,6 +1,5 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-const API = 'https://app.nexapk.in/rajesh/api.php'
 const settings = ref({ claim_mode: 'popup', redirect_url: '', popup_message: '' })
 const saving = ref(false)
 const toast = ref('')
@@ -8,7 +7,7 @@ let toastTimer = null
 function showToast(msg) { toast.value = msg; clearTimeout(toastTimer); toastTimer = setTimeout(() => toast.value = '', 3000) }
 onMounted(async () => {
   try {
-    const res = await fetch(API, { cache: 'no-store' })
+    const res = await fetch('/api/admin/settings', { cache: 'no-store' })
     const data = await res.json()
     if (data.status === 'success' && data.settings) settings.value = { ...settings.value, ...data.settings }
   } catch {}
@@ -16,7 +15,7 @@ onMounted(async () => {
 async function save() {
   saving.value = true
   try {
-    const res = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'update_settings', ...settings.value }) })
+    const res = await fetch('/api/admin/settings', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(settings.value) })
     const data = await res.json()
     showToast(data.status === 'success' ? 'Saved!' : 'Failed to save.')
   } catch { showToast('Network error.') }

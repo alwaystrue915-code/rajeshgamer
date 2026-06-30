@@ -6,14 +6,18 @@ const stats = ref({ totalRewards: 0, claimMode: '—', redirectUrl: '—', popup
 const loading = ref(true)
 onMounted(async () => {
   try {
-    const res = await fetch('https://app.nexapk.in/rajesh/api.php', { cache: 'no-store' })
-    const data = await res.json()
-    if (data.status === 'success') {
+    const [settingsRes, rewardsRes] = await Promise.all([
+      fetch('/api/admin/settings', { cache: 'no-store' }),
+      fetch('/api/rewards', { cache: 'no-store' })
+    ])
+    const settingsData = await settingsRes.json()
+    const rewardsData = await rewardsRes.json()
+    if (settingsData.status === 'success') {
       stats.value = {
-        totalRewards: (data.rewards || []).length,
-        claimMode: data.settings?.claim_mode || '—',
-        redirectUrl: data.settings?.redirect_url || '—',
-        popupMessage: data.settings?.popup_message || '—',
+        totalRewards: (rewardsData.rewards || []).length,
+        claimMode: settingsData.settings?.claim_mode || '—',
+        redirectUrl: settingsData.settings?.redirect_url || '—',
+        popupMessage: settingsData.settings?.popup_message || '—',
       }
     }
   } catch {} finally { loading.value = false }
