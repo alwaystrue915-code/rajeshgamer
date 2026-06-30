@@ -1,6 +1,8 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
+import { useRoute } from 'vue-router'
 import ElectricBorder from './components/ElectricBorder.vue'
+const route = useRoute()
 
 const API_URL = 'https://app.nexapk.in/rajesh/api.php'
 const rewards = ref([])
@@ -117,7 +119,8 @@ onMounted(() => { preconnectDomains(); fetchRewards() })
 </script>
 
 <template>
-  <main class="page-shell" :class="isDarkRoute ? 'page-dark' : 'page-blue'">
+  <router-view v-if="route.path.startsWith('/admin')" />
+  <main v-else class="page-shell" :class="isDarkRoute ? 'page-dark' : 'page-blue'">
     <section class="event-card" :class="isDarkRoute ? 'theme-dark' : 'theme-blue'">
       <header v-if="!isDarkRoute" class="hero">
         <img src="/assets/blue-header.png" alt="Limited time event — Free Fire Premium Rewards" fetchpriority="high" decoding="async">

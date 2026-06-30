@@ -1,0 +1,103 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --admin-bg: #f5f5f7;
+  --admin-sidebar: #0f0f0f;
+  --admin-sidebar-hover: #1a1a1a;
+  --admin-sidebar-active: #2a2a2a;
+  --admin-card: #ffffff;
+  --admin-border: #e5e5ea;
+  --admin-text: #1c1c1e;
+  --admin-text-secondary: #8e8e93;
+  --admin-green: #34c759;
+  --admin-blue: #007aff;
+  --admin-orange: #ff9500;
+  --admin-red: #ff3b30;
+  --admin-purple: #af52de;
+}
+
+.admin-login-page {
+  min-height: 100vh; display: grid; place-items: center;
+  background: radial-gradient(ellipse at 30% 20%,rgba(52,199,89,.15) 0%,transparent 60%),radial-gradient(ellipse at 70% 80%,rgba(0,122,255,.1) 0%,transparent 60%),#0f0f0f;
+  font-family: Inter, system-ui, sans-serif;
+}
+.admin-login-card {
+  width: min(400px,92vw); padding: 40px 32px; border-radius: 20px; text-align: center;
+  background: rgba(255,255,255,.06); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,.1);
+  box-shadow: 0 25px 60px rgba(0,0,0,.5);
+}
+.admin-login-card h1 { margin: 0 0 5px; color: #fff; font-size: 24px; font-weight: 700; }
+.admin-login-card p { margin: 0 0 28px; color: rgba(255,255,255,.5); font-size: 13px; }
+.admin-login-card .logo { width: 48px; height: 48px; margin: 0 auto 16px; border-radius: 14px; background: linear-gradient(135deg,#34c759,#28a745); display: grid; place-items: center; color: #fff; }
+.admin-login-card .logo svg { width: 26px; height: 26px; }
+.admin-login-card .field { margin-bottom: 16px; text-align: left; }
+.admin-login-card label { display: block; margin-bottom: 5px; color: rgba(255,255,255,.6); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; }
+.admin-login-card input { width: 100%; padding: 12px 14px; border: 1px solid rgba(255,255,255,.12); border-radius: 10px; color: #fff; font-size: 14px; background: rgba(255,255,255,.06); outline: 0; box-sizing: border-box; }
+.admin-login-card input:focus { border-color: #34c759; }
+.admin-login-card button { width: 100%; padding: 12px; border: 0; border-radius: 10px; color: #fff; font-size: 15px; font-weight: 600; background: linear-gradient(135deg,#34c759,#28a745); cursor: pointer; margin-top: 8px; }
+.admin-login-card button:active { transform: scale(.97); }
+.admin-login-error { color: #ff453a; font-size: 13px; margin: 8px 0 0; }
+
+.admin-shell { display: flex; min-height: 100vh; font-family: Inter, system-ui, sans-serif; background: var(--admin-bg); color: var(--admin-text); }
+.admin-sidebar { position: fixed; top: 0; left: 0; width: 260px; height: 100vh; display: flex; flex-direction: column; background: var(--admin-sidebar); z-index: 100; }
+.admin-sidebar-header { padding: 20px 20px 16px; border-bottom: 1px solid rgba(255,255,255,.06); display: flex; align-items: center; gap: 10px; }
+.admin-sidebar-header .logo { width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg,#34c759,#28a745); display: grid; place-items: center; flex-shrink: 0; }
+.admin-sidebar-header .logo svg { width: 18px; height: 18px; color: #fff; }
+.admin-sidebar-header span { color: #fff; font-size: 15px; font-weight: 700; }
+.admin-nav { flex: 1; padding: 12px 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; }
+.admin-nav a { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 10px; color: rgba(255,255,255,.55); font-size: 14px; font-weight: 500; text-decoration: none; transition: all .15s ease; }
+.admin-nav a:hover { background: var(--admin-sidebar-hover); color: rgba(255,255,255,.8); }
+.admin-nav a.active { background: var(--admin-sidebar-active); color: #fff; }
+.admin-nav a .nav-icon { width: 20px; height: 20px; flex-shrink: 0; }
+.admin-sidebar-footer { padding: 12px 10px 16px; border-top: 1px solid rgba(255,255,255,.06); }
+.admin-sidebar-footer a { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 10px; color: rgba(255,255,255,.45); font-size: 13px; text-decoration: none; cursor: pointer; }
+.admin-sidebar-footer a:hover { background: var(--admin-sidebar-hover); color: #ff453a; }
+
+.admin-main { margin-left: 260px; flex: 1; padding: 28px 32px; min-height: 100vh; }
+.admin-main h1 { margin: 0 0 5px; font-size: 28px; font-weight: 700; }
+.admin-main .subtitle { color: var(--admin-text-secondary); font-size: 14px; margin: 0 0 28px; }
+
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(200px,1fr)); gap: 16px; margin-bottom: 28px; }
+.stat-card { padding: 20px; border-radius: 16px; background: var(--admin-card); border: 1px solid var(--admin-border); box-shadow: 0 1px 3px rgba(0,0,0,.04); }
+.stat-card .stat-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.stat-card .stat-icon { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; }
+.stat-card .stat-icon svg { width: 20px; height: 20px; }
+.stat-card .stat-label { color: var(--admin-text-secondary); font-size: 13px; font-weight: 500; }
+.stat-card .stat-value { font-size: 28px; font-weight: 700; margin-top: 4px; }
+
+.admin-card { background: var(--admin-card); border-radius: 16px; border: 1px solid var(--admin-border); box-shadow: 0 1px 3px rgba(0,0,0,.04); padding: 24px; margin-bottom: 20px; }
+.admin-card h2 { margin: 0 0 16px; font-size: 17px; font-weight: 600; }
+
+.field-group { margin-bottom: 20px; }
+.field-group label { display: block; margin-bottom: 6px; color: var(--admin-text-secondary); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; }
+.field-group input, .field-group select, .field-group textarea { width: 100%; padding: 10px 14px; border: 1px solid var(--admin-border); border-radius: 10px; font-size: 14px; color: var(--admin-text); background: #fff; outline: 0; box-sizing: border-box; font-family: inherit; }
+.field-group input:focus, .field-group select:focus, .field-group textarea:focus { border-color: var(--admin-blue); box-shadow: 0 0 0 3px rgba(0,122,255,.1); }
+.field-group textarea { resize: vertical; min-height: 80px; }
+
+.admin-btn { padding: 10px 24px; border: 0; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all .15s ease; font-family: inherit; }
+.admin-btn:active { transform: scale(.97); }
+.admin-btn-primary { color: #fff; background: var(--admin-blue); }
+.admin-btn-primary:hover { background: #0066d6; }
+.admin-btn-success { color: #fff; background: var(--admin-green); }
+.admin-btn-success:hover { background: #2db84e; }
+.admin-btn-danger { color: #fff; background: var(--admin-red); }
+.admin-btn-danger:hover { background: #e0352b; }
+.admin-btn-sm { padding: 6px 14px; font-size: 12px; }
+
+.admin-table-wrap { overflow-x: auto; }
+.admin-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.admin-table th { padding: 12px 16px; text-align: left; color: var(--admin-text-secondary); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; border-bottom: 1px solid var(--admin-border); }
+.admin-table td { padding: 12px 16px; border-bottom: 1px solid var(--admin-border); }
+.admin-table tr:last-child td { border-bottom: 0; }
+.admin-table tr:hover td { background: rgba(0,0,0,.02); }
+
+.badge { display: inline-flex; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+.badge-green { background: rgba(52,199,89,.12); color: #1a8a3a; }
+.badge-orange { background: rgba(255,149,0,.12); color: #b86300; }
+.badge-red { background: rgba(255,59,48,.12); color: #c9261d; }
+.badge-blue { background: rgba(0,122,255,.12); color: #0056b3; }
+
+@media (max-width:768px) {
+  .admin-sidebar { display: none; }
+  .admin-main { margin-left: 0; padding: 20px 16px; }
+}
