@@ -181,14 +181,8 @@ onMounted(() => { preconnectDomains(); fetchRewards() })
         <section class="success-modal">
           <div class="success-rings" aria-hidden="true"><span></span><span></span></div>
           <div class="success-gift" aria-hidden="true">
-            <svg viewBox="0 0 72 72">
-              <rect x="12" y="34" width="48" height="30" rx="4" fill="currentColor"/>
-              <rect x="8" y="27" width="56" height="10" rx="5" fill="currentColor"/>
-              <rect x="33" y="27" width="6" height="37" fill="rgba(255,255,255,0.45)"/>
-              <rect x="8" y="41" width="56" height="6" fill="rgba(255,255,255,0.45)"/>
-              <ellipse cx="30" cy="24" rx="9" ry="7" fill="currentColor"/>
-              <ellipse cx="42" cy="24" rx="9" ry="7" fill="currentColor"/>
-              <circle cx="36" cy="26" r="5" fill="rgba(255,255,255,0.55)"/>
+            <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 13h24v15H4zM2 8h28v7H2zM16 8v20M16 8c-1-5-8-7-8-2 0 3 5 3 8 2Zm0 0c1-5 8-7 8-2 0 3-5 3-8 2Z"/>
             </svg>
           </div>
           <p class="success-kicker">REWARD CONFIRMED</p>
