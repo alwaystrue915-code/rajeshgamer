@@ -1,5 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useSocket } from '../composables/useSocket.js'
+const socket = useSocket()
 const settings = ref({ claim_mode: 'popup', redirect_url: '' })
 const saving = ref(false)
 const toast = ref('')
@@ -11,6 +13,7 @@ onMounted(async () => {
     const data = await res.json()
     if (data.status === 'success' && data.settings) settings.value = { ...settings.value, ...data.settings }
   } catch {}
+  socket.on('settings:updated', (s) => { if (s) settings.value = { ...settings.value, ...s } })
 })
 async function save() {
   saving.value = true

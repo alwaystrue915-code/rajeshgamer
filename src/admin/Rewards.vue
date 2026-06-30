@@ -1,5 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useSocket } from '../composables/useSocket.js'
+const socket = useSocket()
 const UPLOAD_API = 'https://app.nexapk.in/api.php'
 const API_KEY = 'yonogames-v2'
 const rewards = ref([])
@@ -8,16 +10,22 @@ const toast = ref('')
 let toastTimer = null
 function showToast(msg) { toast.value = msg; clearTimeout(toastTimer); toastTimer = setTimeout(() => toast.value = '', 3000) }
 
-onMounted(async () => {
+async function loadRewards() {
   try {
     const res = await fetch('/api/rewards', { cache: 'no-store' })
     const data = await res.json()
     if (data.status === 'success') {
       const raw = (data.rewards || []).filter(r => r?.id).slice(0, 6)
-      raw.forEach(r => r.adminImage = null)
+      const old = rewards.value
+      raw.forEach((r, i) => r.adminImage = old[i]?.adminImage || null)
       rewards.value = raw
     }
   } catch {} finally { loading.value = false }
+}
+
+onMounted(() => {
+  loadRewards()
+  socket.on('rewards:updated', () => loadRewards())
 })
 
 function pickUpload(slot) {

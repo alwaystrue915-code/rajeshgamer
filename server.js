@@ -1,6 +1,8 @@
 import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
+import { createServer } from 'http'
+import { Server } from 'socket.io'
 import { PrismaClient } from '@prisma/client'
 import crypto from 'crypto'
 import path from 'path'
@@ -10,6 +12,8 @@ import fs from 'fs'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const prisma = new PrismaClient()
 const app = express()
+const httpServer = createServer(app)
+const io = new Server(httpServer, { cors: { origin: '*', methods: ['GET', 'POST'] } })
 const PORT = process.env.PORT || 3000
 
 app.use(cors())
@@ -21,6 +25,11 @@ function hashPassword(pw) {
 
 const PUBLIC_API = 'https://app.nexapk.in/rajesh/api.php'
 
+io.on('connection', (socket) => {
+  console.log('Admin connected:', socket.id)
+  socket.on('disconnect', () => console.log('Admin disconnected:', socket.id))
+})
+
 app.post('/api/admin/login', async (req, res) => {
   const { username, password } = req.body
   if (!username || !password) return res.status(400).json({ status: 'error', message: 'Fill all fields.' })
@@ -30,7 +39,7 @@ app.post('/api/admin/login', async (req, res) => {
       return res.status(401).json({ status: 'error', message: 'Invalid credentials.' })
     const token = crypto.randomBytes(32).toString('hex')
     res.json({ status: 'success', token })
-  } catch (e) {
+  } catch {
     res.status(500).json({ status: 'error', message: 'Server error.' })
   }
 })
@@ -62,6 +71,10 @@ app.put('/api/admin/settings', async (req, res) => {
         })
       }
     }
+    const rows = await prisma.setting.findMany()
+    const settings = {}
+    rows.forEach(r => settings[r.key] = r.value)
+    io.emit('settings:updated', settings)
     res.json({ status: 'success', message: 'Saved.' })
   } catch { res.status(500).json({ status: 'error', message: 'Failed to save.' }) }
 })
@@ -76,6 +89,7 @@ app.get('/api/rewards', async (req, res) => {
       for (const r of rewards) {
         await prisma.reward.create({ data: { rewardId: String(r.id), imageUrl: r.image_url, slotId: String(r.slot_id) } })
       }
+      io.emit('rewards:updated', rewards)
       return res.json({ status: 'success', rewards })
     }
     const cached = await prisma.reward.findMany()
@@ -92,4 +106,4 @@ app.use((req, res, next) => {
   next()
 })
 
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`))
+httpServer.listen(PORT, () => console.log(`Server running on port ${PORT}`))

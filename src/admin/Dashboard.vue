@@ -1,10 +1,13 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useSocket } from '../composables/useSocket.js'
 const router = useRouter()
-const stats = ref({ totalRewards: 0, claimMode: '—', redirectUrl: '—', popupMessage: '—' })
+const stats = ref({ totalRewards: 0, claimMode: '—', redirectUrl: '—' })
 const loading = ref(true)
-onMounted(async () => {
+const socket = useSocket()
+
+async function loadStats() {
   try {
     const [settingsRes, rewardsRes] = await Promise.all([
       fetch('/api/admin/settings', { cache: 'no-store' }),
@@ -17,10 +20,15 @@ onMounted(async () => {
         totalRewards: (rewardsData.rewards || []).length,
         claimMode: settingsData.settings?.claim_mode || '—',
         redirectUrl: settingsData.settings?.redirect_url || '—',
-        popupMessage: settingsData.settings?.popup_message || '—',
       }
     }
   } catch {} finally { loading.value = false }
+}
+
+onMounted(() => {
+  loadStats()
+  socket.on('settings:updated', () => loadStats())
+  socket.on('rewards:updated', () => loadStats())
 })
 </script>
 <template>
