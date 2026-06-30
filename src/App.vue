@@ -173,12 +173,23 @@ onMounted(() => { preconnectDomains(); fetchRewards() })
     <Transition name="success-pop">
       <div v-if="showSuccess" class="success-overlay" role="dialog" aria-modal="true" aria-labelledby="success-title" @click.self="showSuccess = false">
         <div class="success-particles" aria-hidden="true">
-          <i v-for="n in 18" :key="n" :style="{ '--i': n }"></i>
+          <i v-for="n in 24" :key="n" :style="{ '--i': n }"></i>
+        </div>
+        <div class="success-stars" aria-hidden="true">
+          <b v-for="n in 8" :key="n" :style="{ '--s': n }"></b>
         </div>
         <section class="success-modal">
           <div class="success-rings" aria-hidden="true"><span></span><span></span></div>
-          <div class="success-check" aria-hidden="true">
-            <svg viewBox="0 0 52 52"><path d="M14 27l8 8 17-18"/></svg>
+          <div class="success-gift" aria-hidden="true">
+            <svg viewBox="0 0 72 72">
+              <rect x="12" y="34" width="48" height="30" rx="4" fill="currentColor"/>
+              <rect x="8" y="27" width="56" height="10" rx="5" fill="currentColor"/>
+              <rect x="33" y="27" width="6" height="37" fill="rgba(255,255,255,0.45)"/>
+              <rect x="8" y="41" width="56" height="6" fill="rgba(255,255,255,0.45)"/>
+              <ellipse cx="30" cy="24" rx="9" ry="7" fill="currentColor"/>
+              <ellipse cx="42" cy="24" rx="9" ry="7" fill="currentColor"/>
+              <circle cx="36" cy="26" r="5" fill="rgba(255,255,255,0.55)"/>
+            </svg>
           </div>
           <p class="success-kicker">REWARD CONFIRMED</p>
           <h2 id="success-title">Claim Successful!</h2>
