@@ -150,11 +150,11 @@ onMounted(() => { preconnectDomains(); fetchRewards() })
           :thickness="2"
           :border-radius="20"
         >
-          <article class="reward-card" :class="{ selected: isSelected(reward.id) }" :style="{ '--delay': `${index * 60}ms` }">
+          <article class="reward-card" :class="{ selected: isSelected(reward.id) }" :style="{ '--delay': `${index * 60}ms` }" @click="toggleReward(reward.id)">
             <div class="reward-art reward-image">
               <img :src="reward.image_url" :alt="`Reward ${reward.slot_id}`" loading="lazy" decoding="async" :fetchpriority="index < 3 ? 'high' : 'auto'">
             </div>
-            <button class="claim-small" type="button" @click="toggleReward(reward.id)">
+            <button class="claim-small" type="button" @click.stop="toggleReward(reward.id)">
               {{ isSelected(reward.id) ? 'SELECTED' : 'CLAIM' }}
             </button>
           </article>
