@@ -2,17 +2,13 @@ import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
 import { PrismaClient } from '@prisma/client'
-import { PrismaPg } from '@prisma/adapter-pg'
-import pg from 'pg'
 import crypto from 'crypto'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import fs from 'fs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
-const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } })
-const adapter = new PrismaPg(pool)
-const prisma = new PrismaClient({ adapter })
+const prisma = new PrismaClient()
 const app = express()
 const PORT = process.env.PORT || 3000
 
@@ -34,7 +30,9 @@ app.post('/api/admin/login', async (req, res) => {
       return res.status(401).json({ status: 'error', message: 'Invalid credentials.' })
     const token = crypto.randomBytes(32).toString('hex')
     res.json({ status: 'success', token })
-  } catch { res.status(500).json({ status: 'error', message: 'Server error.' }) }
+  } catch (e) {
+    res.status(500).json({ status: 'error', message: 'Server error.' })
+  }
 })
 
 app.get('/api/admin/session', (req, res) => {
@@ -87,12 +85,11 @@ app.get('/api/rewards', async (req, res) => {
 
 const distPath = path.join(__dirname, 'dist')
 app.use(express.static(distPath))
-app.get('*', (req, res) => {
-  if (!req.path.startsWith('/api')) {
-    const indexPath = path.join(distPath, 'index.html')
-    if (fs.existsSync(indexPath)) return res.sendFile(indexPath)
-  }
-  res.status(404).json({ error: 'Not found' })
+app.use((req, res, next) => {
+  if (req.path.startsWith('/api')) return next()
+  const indexPath = path.join(distPath, 'index.html')
+  if (fs.existsSync(indexPath)) return res.sendFile(indexPath)
+  next()
 })
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`))
