@@ -188,7 +188,12 @@ body { background: #050505; }
 }
 
 /* Home route: restored blue-white rewards page */
-.page-blue { background: radial-gradient(circle at 50% 5%,#fff 0 18%,transparent 45%),linear-gradient(145deg,#dceeff,#f9fdff 46%,#dbeeff); }
+.page-blue { position: relative; background: radial-gradient(circle at 50% 5%,#fff 0 18%,transparent 45%),linear-gradient(145deg,#dceeff,#f9fdff 46%,#dbeeff); }
+.page-blue::before { content: ''; position: absolute; z-index: -1; inset: 0; pointer-events: none; background:
+  radial-gradient(ellipse 220px 200px at 3% 4%,rgba(22,140,255,.12) 0%,transparent 100%),
+  radial-gradient(ellipse 220px 200px at 97% 4%,rgba(22,140,255,.08) 0%,transparent 100%),
+  radial-gradient(ellipse 200px 180px at 4% 96%,rgba(57,199,255,.08) 0%,transparent 100%),
+  radial-gradient(ellipse 200px 180px at 96% 96%,rgba(57,199,255,.1) 0%,transparent 100%); }
 .theme-blue {
   width: min(658px,100%); min-height: 100vh; padding: 22px clamp(18px,4vw,29px) 24px; color: #071842;
   background: linear-gradient(180deg,rgba(255,255,255,.98),rgba(242,250,255,.97)); box-shadow: 0 0 45px rgba(14,86,170,.14);
