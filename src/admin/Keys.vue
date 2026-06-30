@@ -34,6 +34,10 @@ async function toggleKey(id) {
     else showToast(data.message || 'Failed.')
   } catch { showToast('Network error.') }
 }
+async function copyKey(k) {
+  try { await navigator.clipboard.writeText(k.key); showToast('Copied!') }
+  catch { showToast('Copy failed.') }
+}
 async function deleteKey(id) {
   if (!confirm('Delete this key?')) return
   try {
@@ -56,7 +60,7 @@ onUnmounted(() => { socket.off('keys:updated', loadKeys) })
   <div v-else class="key-list">
     <div v-for="k in keys" :key="k.id" class="key-row" :class="{ inactive: !k.is_active }">
       <div class="key-info">
-        <code class="key-value">{{ k.key }}</code>
+        <code class="key-value" @click="copyKey(k)" title="Tap to copy">{{ k.key }}</code>
         <span class="key-status" :class="k.is_active ? 'active' : 'deactive'">{{ k.is_active ? 'Active' : 'Deactivated' }}</span>
       </div>
       <div class="key-meta">
@@ -79,7 +83,8 @@ onUnmounted(() => { socket.off('keys:updated', loadKeys) })
 .key-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 14px 18px; border-radius: 16px; background: var(--admin-card); border: 1px solid var(--admin-border); box-shadow: var(--admin-shadow); }
 .key-row.inactive { opacity: .6; }
 .key-info { display: flex; align-items: center; gap: 10px; flex: 1 1 200px; }
-.key-value { font-size: 14px; font-weight: 700; letter-spacing: .5px; padding: 4px 10px; border-radius: 8px; background: #f2f5f9; color: #1a1a2e; }
+.key-value { font-size: 14px; font-weight: 700; letter-spacing: .5px; padding: 4px 10px; border-radius: 8px; background: #f2f5f9; color: #1a1a2e; cursor: pointer; transition: background .15s; }
+.key-value:hover { background: #e5e9f0; }
 .key-status { font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 999px; text-transform: uppercase; }
 .key-status.active { background: rgba(52,199,89,.12); color: #34c759; }
 .key-status.deactive { background: rgba(255,59,48,.1); color: #ff3b30; }
