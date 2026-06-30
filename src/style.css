@@ -279,9 +279,9 @@ body { background: #050505; }
   animation: app-popup-hover 1.8s ease-in-out infinite alternate;
 }
 .page-dark .success-modal::after { content: ''; position: absolute; inset: 9px; border: 1px solid rgba(255,189,0,.3); clip-path: inherit; pointer-events: none; }
-.page-dark .success-gift { top: -28px; width: 62px; height: 62px; border: 2px solid #ffe162; border-radius: 8px; transform: translateX(-50%) rotate(45deg); box-shadow: 0 0 22px rgba(255,174,0,.7),0 8px 20px #000; animation: app-check-glow 2s ease-in-out infinite alternate; }
-.page-dark .success-gift svg { width: 36px; transform: rotate(-45deg); }
-.page-dark .success-rings span { top: 2px; width: 55px; height: 55px; border-color: #ff9d00; border-radius: 8px; transform: translate(-50%,-50%) rotate(45deg); animation-name: app-ring-pulse; animation-duration: 1.5s; }
+.page-dark .success-gift { top: -14px; width: 62px; height: 62px; border: 2px solid #ffe162; border-radius: 8px; transform: translateX(-50%) rotate(45deg); box-shadow: 0 0 22px rgba(255,174,0,.7),0 8px 20px #000; animation: app-check-glow 2s ease-in-out infinite alternate; }
+.page-dark .success-gift svg { width: 38px; transform: rotate(-45deg); }
+.page-dark .success-rings span { top: -12px; width: 58px; height: 58px; border-color: #ff9d00; border-radius: 8px; transform: translate(-50%,-50%) rotate(45deg); animation-name: app-ring-pulse; animation-duration: 1.5s; }
 .page-dark .success-kicker { margin-top: 0; letter-spacing: 3px; animation: app-text-fade .5s .15s both; }
 .page-dark .success-modal h2 { text-transform: uppercase; letter-spacing: 1px; font-size: 28px; animation: app-text-fade .6s .3s both; }
 .page-dark .success-modal button { border-radius: 0; clip-path: polygon(8px 0,calc(100% - 8px) 0,100% 8px,100% calc(100% - 8px),calc(100% - 8px) 100%,8px 100%,0 calc(100% - 8px),0 8px); animation: app-text-fade .5s .5s both; }
