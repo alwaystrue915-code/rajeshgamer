@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && prisma generate",
     "preview": "vite preview",
     "seed": "node seed.js",
     "start": "node server.js"
