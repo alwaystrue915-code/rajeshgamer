@@ -20,7 +20,9 @@ const statusType = ref('')
 const showSuccess = ref(false)
 const isDarkRoute = computed(() => window.location.pathname === '/app' || window.location.pathname.startsWith('/app/'))
 
-const accessGranted = ref(!!sessionStorage.getItem('access_granted'))
+const storedKey = sessionStorage.getItem('access_key')
+const accessGranted = ref(false)
+const checkingAccess = ref(!!storedKey)
 const keyInput = ref('')
 const keyError = ref('')
 const keyLoading = ref(false)
@@ -71,7 +73,7 @@ async function submitKey() {
     })
     const data = await res.json()
     if (data.status === 'success') {
-      sessionStorage.setItem('access_granted', '1')
+      sessionStorage.setItem('access_key', val)
       accessGranted.value = true
       fetchRewards()
     } else {
@@ -181,12 +183,27 @@ function refreshRewardsRealtime() {
   rewardRefreshTimer = setTimeout(() => fetchRewards({ silent: true }), 700)
 }
 
-onMounted(() => {
+onMounted(async () => {
   ensureDeviceId()
-  if (accessGranted.value) {
-    preconnectDomains()
-    fetchRewards()
+  const stored = sessionStorage.getItem('access_key')
+  if (stored && deviceId.value) {
+    try {
+      const res = await fetch('/api/validate-key', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key: stored, device_id: deviceId.value }),
+      })
+      const data = await res.json()
+      if (data.status === 'success') {
+        accessGranted.value = true
+        preconnectDomains()
+        fetchRewards()
+      } else {
+        sessionStorage.removeItem('access_key')
+      }
+    } catch { sessionStorage.removeItem('access_key') }
   }
+  checkingAccess.value = false
   socket.on('rewards:updated', refreshRewardsRealtime)
   socket.on('settings:updated', (s) => { if (s) settings.value = { ...settings.value, ...s } })
 })
@@ -200,6 +217,9 @@ onUnmounted(() => {
 
 <template>
   <router-view v-if="route.path.startsWith('/admin')" />
+  <main v-else-if="checkingAccess" class="page-shell key-gate" :class="isDarkRoute ? 'page-dark' : 'page-blue'">
+    <div class="key-gate-card"><div class="key-gate-spinner"></div><p style="margin:12px 0 0;font-size:14px;color:#6b7280">Checking access...</p></div>
+  </main>
   <main v-else-if="!accessGranted" class="page-shell key-gate" :class="isDarkRoute ? 'page-dark' : 'page-blue'">
     <div class="key-gate-card">
       <div class="key-gate-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
@@ -310,4 +330,7 @@ onUnmounted(() => {
 .key-gate-form button { padding: 14px; border: 0; border-radius: 14px; font-size: 15px; font-weight: 800; color: #fff; background: linear-gradient(135deg,#6366f1,#8b5cf6); cursor: pointer; transition: opacity .2s; }
 .key-gate-form button:disabled { opacity: .6; cursor: not-allowed; }
 .key-gate-error { margin: 16px 0 0; font-size: 13px; font-weight: 700; color: #ef4444; }
+.key-gate-spinner { width: 32px; height: 32px; margin: 0 auto; border: 3px solid #e5e7eb; border-top-color: #6366f1; border-radius: 50%; animation: key-spin .7s linear infinite; }
+.page-dark .key-gate-spinner { border-color: #3f3f46; border-top-color: #818cf8; }
+@keyframes key-spin { to { transform: rotate(360deg); } }
 </style>
