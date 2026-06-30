@@ -17,7 +17,7 @@ async function loadRewards(forceRefresh = false) {
   const controller = new AbortController()
   const timeout = setTimeout(() => controller.abort(), 10000)
   try {
-    const res = await fetch(`/api/rewards${forceRefresh ? '?refresh=1' : ''}`, { cache: 'no-store', signal: controller.signal })
+    const res = await fetch(`/api/admin/rewards${forceRefresh ? '?refresh=1' : ''}`, { cache: 'no-store', signal: controller.signal })
     const data = await res.json()
     if (data.status === 'success') {
       const raw = (data.rewards || []).filter(r => r?.id).slice(0, 6)

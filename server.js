@@ -81,21 +81,42 @@ function mapReward(r) {
   return { id: r.rewardId, image_url: r.imageUrl, slot_id: r.slotId }
 }
 
-async function getCachedRewards() {
-  const rows = await prisma.reward.findMany({ orderBy: { slotId: 'asc' } })
+async function getRewardRows({ uploadedOnly = false } = {}) {
+  const where = uploadedOnly ? { imageUrl: { not: '' } } : undefined
+  const rows = await prisma.reward.findMany({ where, orderBy: [{ slotId: 'asc' }, { id: 'asc' }] })
+  const seenSlots = new Set()
+  const uniqueRows = []
+  for (const row of rows) {
+    const slot = String(row.slotId || row.rewardId)
+    if (seenSlots.has(slot)) continue
+    seenSlots.add(slot)
+    uniqueRows.push(row)
+  }
+  return uniqueRows
+}
+
+async function getCachedRewards(options) {
+  const rows = await getRewardRows(options)
   return rows.map(mapReward)
 }
 
 async function ensureFallbackSlots() {
   for (let i = 1; i <= 6; i += 1) {
-    const id = `slot-${i}`
-    const existing = await prisma.reward.findFirst({ where: { rewardId: id } })
+    const id = `admin-slot-${i}`
+    const existing = await prisma.reward.findFirst({ where: { slotId: String(i) } })
     if (!existing) await prisma.reward.create({ data: { rewardId: id, slotId: String(i), imageUrl: '' } })
   }
   return getCachedRewards()
 }
 
 app.get('/api/rewards', async (req, res) => {
+  try {
+    const rewards = await getCachedRewards({ uploadedOnly: true })
+    res.json({ status: 'success', rewards })
+  } catch { res.status(500).json({ status: 'error', message: 'Failed.' }) }
+})
+
+app.get('/api/admin/rewards', async (req, res) => {
   try {
     let rewards = await getCachedRewards()
     if (!rewards.length) rewards = await ensureFallbackSlots()
@@ -109,14 +130,17 @@ app.put('/api/admin/rewards/:id', async (req, res) => {
     const imageUrl = req.body.image_url === null ? '' : String(req.body.image_url || '')
     const slotId = String(req.body.slot_id || '')
     const existing = await prisma.reward.findFirst({ where: { rewardId: id } })
-    if (!existing) return res.status(404).json({ status: 'error', message: 'Reward not found.' })
-    await prisma.reward.update({
-      where: { id: existing.id },
-      data: { imageUrl, slotId: slotId || existing.slotId },
-    })
-    const rewards = await getCachedRewards()
+    if (existing) {
+      await prisma.reward.update({
+        where: { id: existing.id },
+        data: { imageUrl, slotId: slotId || existing.slotId },
+      })
+    } else {
+      await prisma.reward.create({ data: { rewardId: id, slotId: slotId || id, imageUrl } })
+    }
+    const rewards = await getCachedRewards({ uploadedOnly: true })
     io.emit('rewards:updated', rewards)
-    res.json({ status: 'success', rewards })
+    res.json({ status: 'success', rewards: await getCachedRewards() })
   } catch { res.status(500).json({ status: 'error', message: 'Failed to update reward.' }) }
 })
 
@@ -125,11 +149,11 @@ app.delete('/api/admin/rewards/:id', async (req, res) => {
     const id = String(req.params.id)
     const existing = await prisma.reward.findFirst({ where: { rewardId: id } })
     if (!existing) return res.status(404).json({ status: 'error', message: 'Reward not found.' })
-    await prisma.reward.update({ where: { id: existing.id }, data: { imageUrl: '' } })
-    const rewards = await getCachedRewards()
+    await prisma.reward.delete({ where: { id: existing.id } })
+    const rewards = await getCachedRewards({ uploadedOnly: true })
     io.emit('rewards:updated', rewards)
-    res.json({ status: 'success', rewards })
-  } catch { res.status(500).json({ status: 'error', message: 'Failed to delete reward image.' }) }
+    res.json({ status: 'success', rewards: await getCachedRewards() })
+  } catch { res.status(500).json({ status: 'error', message: 'Failed to delete reward slot.' }) }
 })
 
 const distPath = path.join(__dirname, 'dist')
