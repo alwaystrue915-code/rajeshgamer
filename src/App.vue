@@ -136,13 +136,13 @@ onMounted(() => {
   preconnectDomains()
   fetchRewards()
   socket.on('rewards:updated', refreshRewardsRealtime)
-  socket.on('settings:updated', refreshRewardsRealtime)
+  socket.on('settings:updated', (s) => { if (s) settings.value = { ...settings.value, ...s } })
 })
 
 onUnmounted(() => {
   clearTimeout(rewardRefreshTimer)
   socket.off('rewards:updated', refreshRewardsRealtime)
-  socket.off('settings:updated', refreshRewardsRealtime)
+  socket.off('settings:updated')
 })
 </script>
 
