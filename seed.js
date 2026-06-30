@@ -8,8 +8,8 @@ function hashPassword(pw) {
   return crypto.createHash('sha256').update(pw + 'premium-rewards-salt').digest('hex')
 }
 
-const username = process.env.ADMIN_USER || 'admin'
-const password = process.env.ADMIN_PASS || 'admin123'
+const username = process.env.ADMIN_USER || 'rajeshgamer@app'
+const password = process.env.ADMIN_PASS || 'rajeshff#0964'
 
 await prisma.adminUser.upsert({
   where: { username },
