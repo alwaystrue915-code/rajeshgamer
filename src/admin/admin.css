@@ -179,7 +179,7 @@
 .mobile-overlay { animation: admin-fade .2s ease; }
 .mobile-sidebar { animation: admin-slide .25s ease; }
 .mobile-backdrop { background: rgba(15,23,42,.55) !important; }
-.mobile-sidebar,.admin-mobile-header { background: #111827 !important; }
+.mobile-sidebar::before { display: none; }
 .mobile-sidebar-header { border-bottom-color: rgba(255,255,255,.08) !important; }
 .mobile-sidebar-header span,.admin-mobile-header span { color: #fff !important; }
 .mobile-close,.mobile-hamburger { color: #dbe2f1 !important; }
